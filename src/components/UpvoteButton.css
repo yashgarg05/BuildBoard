@@ -1,0 +1,70 @@
+.upvote-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  min-height: 56px;
+  padding: 0.5rem;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.upvote-btn:hover {
+  border-color: var(--border-dark);
+  background-color: var(--bg-secondary);
+  color: var(--accent-black);
+}
+
+.upvote-btn.voted {
+  background-color: #e07a5f;
+  border-color: #d46c51;
+  color: #ffffff;
+  box-shadow: var(--shadow-orange);
+}
+
+.upvote-btn.voted:hover {
+  background-color: #e8876c;
+  border-color: #e07a5f;
+}
+
+.upvote-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--transition-fast);
+}
+
+.upvote-btn:hover .upvote-icon {
+  transform: translateY(-2px);
+}
+
+.upvote-count {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+/* Horizontal / Small size variant for detail page header */
+.upvote-btn.size-large {
+  flex-direction: row;
+  gap: 0.625rem;
+  min-width: 100px;
+  min-height: 44px;
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-md);
+}
+
+.upvote-btn.size-large .upvote-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.upvote-btn.size-large .upvote-count {
+  margin-top: 0;
+  font-size: 0.9375rem;
+}
