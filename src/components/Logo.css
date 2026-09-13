@@ -1,0 +1,132 @@
+/* BuildBoard Logo Styling */
+
+.bb-logo-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  user-select: none;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.bb-logo-icon {
+  display: block;
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease;
+  filter: drop-shadow(0 2px 8px rgba(238, 82, 43, 0.22));
+}
+
+.bb-logo-wrapper:hover .bb-logo-icon {
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 14px rgba(238, 82, 43, 0.35));
+}
+
+.bb-logo-text-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  position: relative;
+}
+
+.bb-brand-name {
+  font-family: var(--font-family, 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  display: inline-flex;
+  align-items: baseline;
+  line-height: 1;
+}
+
+/* "Build" portion */
+.bb-brand-build {
+  color: var(--text-primary, #171717);
+  transition: color 0.15s ease;
+}
+
+/* Forced light theme (e.g., in light cards or exports) */
+.bb-theme-light .bb-brand-build {
+  color: #171717;
+}
+
+/* Forced dark theme */
+.bb-theme-dark .bb-brand-build {
+  color: #ffffff;
+}
+
+/* "Board" portion */
+.bb-brand-board {
+  color: #ee522b;
+  background: linear-gradient(135deg, #ff6338 0%, #ee522b 60%, #e04018 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Version Pill Badge */
+.bb-version-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.18rem 0.45rem;
+  border-radius: 6px;
+  background-color: #feece6;
+  color: #ee522b;
+  font-family: var(--font-family, 'Plus Jakarta Sans', sans-serif);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border: 1px solid rgba(238, 82, 43, 0.25);
+  transform: translateY(-4px);
+  white-space: nowrap;
+}
+
+.bb-theme-light .bb-version-badge {
+  background-color: #feece6;
+  color: #ee522b;
+  border-color: rgba(238, 82, 43, 0.25);
+}
+
+/* Sizing Modifiers */
+.bb-logo-xs .bb-brand-name {
+  font-size: 0.95rem;
+}
+.bb-logo-xs .bb-version-badge {
+  font-size: 0.58rem;
+  padding: 0.1rem 0.3rem;
+  transform: translateY(-3px);
+}
+
+.bb-logo-sm .bb-brand-name {
+  font-size: 1.15rem;
+}
+.bb-logo-sm .bb-version-badge {
+  font-size: 0.62rem;
+  padding: 0.12rem 0.35rem;
+  transform: translateY(-3px);
+}
+
+.bb-logo-md .bb-brand-name {
+  font-size: 1.35rem;
+}
+.bb-logo-md .bb-version-badge {
+  font-size: 0.7rem;
+  padding: 0.18rem 0.45rem;
+  transform: translateY(-4px);
+}
+
+.bb-logo-lg .bb-brand-name {
+  font-size: 1.85rem;
+}
+.bb-logo-lg .bb-version-badge {
+  font-size: 0.85rem;
+  padding: 0.22rem 0.55rem;
+  transform: translateY(-6px);
+}
+
+.bb-logo-xl .bb-brand-name {
+  font-size: 2.35rem;
+}
+.bb-logo-xl .bb-version-badge {
+  font-size: 1rem;
+  padding: 0.28rem 0.65rem;
+  transform: translateY(-8px);
+}

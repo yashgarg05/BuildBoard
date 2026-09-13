@@ -11,9 +11,10 @@
   flex-direction: column;
   gap: 2rem;
   padding: 2.5rem;
-  background: radial-gradient(circle at 80% 20%, rgba(255, 85, 0, 0.08) 0%, #15110e 70%);
-  border: 1px solid var(--border-dark);
+  background: radial-gradient(circle at 85% 15%, rgba(224, 122, 95, 0.07) 0%, #ffffff 70%);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .profile-header-content {
@@ -31,8 +32,8 @@
   height: 96px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #ff6525;
-  box-shadow: 0 0 16px rgba(255, 85, 0, 0.3);
+  border: 3px solid #e07a5f;
+  box-shadow: 0 2px 10px rgba(224, 122, 95, 0.2);
 }
 
 .profile-details {
@@ -58,7 +59,7 @@
 .profile-handle {
   font-size: 1rem;
   font-weight: 600;
-  color: #ff7733;
+  color: var(--text-orange);
 }
 
 .profile-bio {
@@ -110,7 +111,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background-color: var(--bg-tertiary);
+  background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   text-align: center;
@@ -157,13 +158,13 @@
 
 .profile-tab:hover {
   color: var(--text-primary);
-  background-color: var(--bg-tertiary);
+  background-color: var(--bg-secondary);
 }
 
 .profile-tab.active {
-  background: linear-gradient(135deg, #ff6525 0%, #e04400 100%);
+  background-color: #e07a5f;
   color: #ffffff;
-  border-color: #ff6525;
+  border-color: #d46c51;
   box-shadow: var(--shadow-orange);
 }
 
@@ -193,9 +194,9 @@
   font-size: 0.8125rem;
   font-weight: 600;
   border-radius: 9999px;
-  color: var(--accent-orange);
-  border: 1px solid var(--accent-orange);
-  background: rgba(224, 122, 95, 0.08);
+  color: var(--text-orange);
+  border: 1px solid var(--text-orange);
+  background: #fff0eb;
   transition: all var(--transition-fast);
   text-decoration: none;
 }
@@ -203,6 +204,7 @@
 .btn-edit-pill:hover {
   background-color: var(--accent-orange);
   color: #ffffff;
+  border-color: var(--accent-orange);
   box-shadow: var(--shadow-orange);
   transform: translateY(-1px);
 }
@@ -238,7 +240,7 @@
 }
 
 .review-product-link:hover {
-  color: #ff6525;
+  color: var(--text-orange);
 }
 
 .review-rating-stars {

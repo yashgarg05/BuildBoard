@@ -9,6 +9,7 @@
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
   transition: all var(--transition-fast);
   color: var(--text-primary);
   cursor: pointer;
@@ -18,7 +19,7 @@
 .upvote-btn:hover {
   border-color: var(--border-dark);
   background-color: var(--bg-secondary);
-  color: var(--accent-black);
+  color: var(--text-orange);
 }
 
 .upvote-btn.voted {
@@ -29,8 +30,9 @@
 }
 
 .upvote-btn.voted:hover {
-  background-color: #e8876c;
-  border-color: #e07a5f;
+  background-color: #d4684d;
+  border-color: #c4573b;
+  color: #ffffff;
 }
 
 .upvote-icon {

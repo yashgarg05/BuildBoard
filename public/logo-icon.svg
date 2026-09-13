@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 106 100" fill="none">
+  <defs>
+    <!-- Left Pillar Gradient -->
+    <linearGradient id="bb-grad-pillar" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFA86E" />
+      <stop offset="40%" stop-color="#FF7D42" />
+      <stop offset="100%" stop-color="#E8481E" />
+    </linearGradient>
+
+    <!-- Top Lobe Gradient -->
+    <linearGradient id="bb-grad-top" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFA36B" />
+      <stop offset="50%" stop-color="#FF7338" />
+      <stop offset="100%" stop-color="#E84419" />
+    </linearGradient>
+
+    <!-- Bottom Lobe Gradient -->
+    <linearGradient id="bb-grad-bottom" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7F44" />
+      <stop offset="60%" stop-color="#EF4E21" />
+      <stop offset="100%" stop-color="#D7350A" />
+    </linearGradient>
+
+    <!-- Subtle Soft Inner Highlight -->
+    <linearGradient id="bb-soft-glow" x1="20%" y1="0%" x2="20%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.25" />
+      <stop offset="60%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Left Capsule Bar -->
+  <rect x="2" y="4" width="23" height="92" rx="11.5" fill="url(#bb-grad-pillar)" />
+  <rect x="2" y="4" width="23" height="46" rx="11.5" fill="url(#bb-soft-glow)" opacity="0.4" />
+
+  <!-- Top Rounded Lobe -->
+  <rect x="33" y="4" width="70" height="43" rx="17" fill="url(#bb-grad-top)" />
+  <rect x="33" y="4" width="70" height="24" rx="12" fill="url(#bb-soft-glow)" opacity="0.3" />
+
+  <!-- Bottom Rounded Lobe -->
+  <rect x="33" y="53" width="70" height="43" rx="17" fill="url(#bb-grad-bottom)" />
+  <rect x="33" y="53" width="70" height="24" rx="12" fill="url(#bb-soft-glow)" opacity="0.15" />
+</svg>

@@ -29,13 +29,13 @@
 
 .winner-podium-container {
   padding: 2.5rem 2rem;
-  background: radial-gradient(ellipse at 50% 0%, rgba(224, 122, 95, 0.08) 0%, #16110e 80%);
-  border: 1px solid var(--border-dark);
+  background: radial-gradient(ellipse at 50% 0%, rgba(224, 122, 95, 0.08) 0%, rgba(255, 255, 255, 0.9) 75%), #ffffff;
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-md);
 }
 
 .winner-section-header {
@@ -49,7 +49,7 @@
 .trophy-icon {
   width: 15px;
   height: 15px;
-  color: #e07a5f;
+  color: var(--text-orange);
 }
 
 .winner-section-header h2 {
@@ -79,6 +79,7 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   position: relative;
+  box-shadow: var(--shadow-sm);
   transition: all var(--transition-fast);
 }
 
@@ -90,18 +91,20 @@
 /* Podium Rank Variations */
 .winner-card.rank-gold {
   border: 1px solid rgba(224, 122, 95, 0.35);
-  background: linear-gradient(145deg, rgba(224, 122, 95, 0.07) 0%, #17120f 80%);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(145deg, #fff9f6 0%, #ffffff 80%);
+  box-shadow: 0 2px 12px rgba(224, 122, 95, 0.12);
 }
 
 .winner-card.rank-silver {
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.03) 0%, #17120f 80%);
+  border: 1px solid #e5e7eb;
+  background: linear-gradient(145deg, #f8f9fa 0%, #ffffff 80%);
+  box-shadow: var(--shadow-sm);
 }
 
 .winner-card.rank-bronze {
-  border: 1px solid rgba(217, 119, 6, 0.22);
-  background: linear-gradient(145deg, rgba(217, 119, 6, 0.04) 0%, #17120f 80%);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+  background: linear-gradient(145deg, #fffbf5 0%, #ffffff 80%);
+  box-shadow: 0 2px 10px rgba(217, 119, 6, 0.08);
 }
 
 .winner-card-top {
@@ -115,8 +118,8 @@
   font-weight: 700;
   color: var(--text-primary);
   padding: 0.25rem 0.65rem;
-  background: rgba(224, 122, 95, 0.12);
-  border: 1px solid rgba(224, 122, 95, 0.25);
+  background: #f1f3f5;
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-full);
 }
 
@@ -138,14 +141,14 @@
   height: 48px;
   min-width: 48px;
   border-radius: var(--radius-md);
-  background: rgba(224, 122, 95, 0.12);
+  background: #fff0eb;
   border: 1px solid rgba(224, 122, 95, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
   font-size: 1.35rem;
-  color: #e07a5f;
+  color: var(--text-orange);
 }
 
 .winner-info {
@@ -162,7 +165,7 @@
 }
 
 .winner-title:hover {
-  color: #e07a5f;
+  color: var(--text-orange);
 }
 
 .winner-tagline {
@@ -214,9 +217,10 @@
   flex-direction: column;
   gap: 1.25rem;
   padding: 1.25rem;
-  background-color: var(--bg-secondary);
+  background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .search-box {
@@ -239,7 +243,7 @@
   padding: 0.75rem 2.5rem 0.75rem 2.5rem;
   font-size: 0.9375rem;
   color: var(--text-primary);
-  background-color: var(--bg-tertiary);
+  background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-full);
   outline: none;
@@ -281,7 +285,7 @@
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--text-secondary);
-  background-color: var(--bg-tertiary);
+  background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-full);
   transition: all var(--transition-fast);
@@ -293,9 +297,9 @@
 }
 
 .tab-btn.active {
-  background: linear-gradient(135deg, #ff6525 0%, #e04400 100%);
+  background-color: #e07a5f;
   color: #ffffff;
-  border-color: #ff6525;
+  border-color: #d46c51;
   box-shadow: var(--shadow-orange);
 }
 
