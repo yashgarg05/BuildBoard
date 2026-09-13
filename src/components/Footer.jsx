@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Logo } from './Logo';
 import './Footer.css';
 
 export const Footer = () => {
@@ -7,14 +8,9 @@ export const Footer = () => {
     <footer className="footer">
       <div className="container footer-container">
         <div className="footer-brand">
-          <div className="footer-logo">
-            <svg className="footer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="4"/>
-              <path d="M8 12h8"/>
-              <path d="M12 8v8"/>
-            </svg>
-            <span>BuildBoard</span>
-          </div>
+          <Link to="/" className="footer-logo" aria-label="BuildBoard Home">
+            <Logo size="sm" showBadge={true} />
+          </Link>
           <p className="footer-tagline">
             The minimal product discovery platform for modern software creators.
           </p>

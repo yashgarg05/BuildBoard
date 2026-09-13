@@ -9,7 +9,7 @@
 .hero-section {
   padding: 5.5rem 0 3.5rem 0;
   text-align: center;
-  background: radial-gradient(ellipse at 50% 10%, rgba(224, 122, 95, 0.08) 0%, rgba(13, 10, 8, 1) 68%);
+  background: radial-gradient(ellipse at 50% 0%, rgba(224, 122, 95, 0.08) 0%, rgba(248, 249, 250, 0) 70%), var(--bg-primary);
 }
 
 .hero-container {
@@ -57,7 +57,7 @@
   justify-content: center;
   gap: 2.5rem;
   padding: 1.4rem 2.5rem;
-  background-color: var(--bg-secondary);
+  background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
@@ -133,12 +133,12 @@
   width: 48px;
   height: 48px;
   border-radius: var(--radius-md);
-  background: rgba(224, 122, 95, 0.1);
+  background: rgba(224, 122, 95, 0.08);
   border: 1px solid rgba(224, 122, 95, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #e07a5f;
+  color: var(--text-orange);
 }
 
 .feature-icon-wrapper svg {
@@ -165,9 +165,10 @@
 .cta-banner-card {
   text-align: center;
   padding: 4rem 2rem;
-  background: radial-gradient(circle at 50% 50%, rgba(224, 122, 95, 0.08) 0%, #16110e 80%);
-  border: 1px solid var(--border-dark);
+  background: radial-gradient(circle at 50% 30%, rgba(224, 122, 95, 0.06) 0%, #ffffff 75%);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   align-items: center;

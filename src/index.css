@@ -1,38 +1,38 @@
 /* BuildBoard Core Design System & Global Styles */
 
 :root {
-  /* Color Palette - Dark Espresso & Muted Terracotta Peach Theme */
-  --bg-primary: #0d0a08;        /* Deep dark espresso black */
-  --bg-secondary: #16110e;      /* Dark coffee section background */
-  --bg-tertiary: #1f1813;       /* Dark mocha container */
-  --bg-hover: #2b211a;          /* Soft dark hover state */
-  --card-bg: #15110e;           /* Dark chocolate card background */
+  /* Color Palette - Clean & Editorial Light Theme with Warm Terracotta Accent */
+  --bg-primary: #f8f9fa;        /* Clean soft light neutral background */
+  --bg-secondary: #f1f3f5;      /* Subtle secondary section background */
+  --bg-tertiary: #ffffff;       /* Pure white container & element surface */
+  --bg-hover: #f1f3f5;          /* Soft light hover state */
+  --card-bg: #ffffff;           /* Clean white card surface */
   
-  --text-primary: #ffffff;      /* Crisp white headings */
-  --text-secondary: #c5b6ab;    /* Warm readable tan-gray body text */
-  --text-muted: #807065;        /* Muted coffee taupe */
-  --text-inverse: #0d0a08;      /* Dark text for white buttons */
+  --text-primary: #171717;      /* Crisp dark charcoal headings & titles */
+  --text-secondary: #4b5563;    /* Highly readable neutral body text */
+  --text-muted: #9ca3af;        /* Refined muted gray for timestamps & counts */
+  --text-inverse: #ffffff;      /* White text for dark surfaces */
 
-  --text-orange: #e07a5f;       /* Muted warm terracotta peach */
+  --text-orange: #c84b29;       /* WCAG AA compliant terracotta peach for text */
   --accent-orange: #e07a5f;     /* Warm Terracotta Accent */
-  --accent-orange-glow: rgba(224, 122, 95, 0.2);
+  --accent-orange-glow: rgba(224, 122, 95, 0.22);
 
-  --border-light: #201813;
-  --border-color: #291f19;      /* Dark coffee border */
-  --border-dark: #3d2f26;       /* Soft border on hover */
+  --border-light: #f1f3f5;
+  --border-color: #e5e7eb;      /* Subtle crisp border */
+  --border-dark: #d1d5db;       /* Border on hover & active surfaces */
   --border-focus: #e07a5f;      /* Soft terracotta focus indicator */
 
-  --accent-black: #ffffff;
-  --accent-gray: #f0e5dd;
-  --accent-subtle: #9c8a7d;
+  --accent-black: #171717;
+  --accent-gray: #4b5563;
+  --accent-subtle: #9ca3af;
 
-  --badge-bg: #221a14;
-  --badge-text: #e07a5f;
-  --badge-border: #3b2a1f;
+  --badge-bg: #f1f3f5;
+  --badge-text: #374151;
+  --badge-border: #e5e7eb;
 
-  --success-bg: #142416;
-  --success-text: #52c462;
-  --success-border: #1e3d22;
+  --success-bg: #ecfdf5;
+  --success-text: #059669;
+  --success-border: #a7f3d0;
 
   /* Layout & Dimensions */
   --max-width: 1200px;
@@ -46,10 +46,10 @@
   --font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   
   /* Refined Shadows & Accents */
-  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
-  --shadow-orange: 0 4px 14px rgba(224, 122, 95, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+  --shadow-orange: 0 4px 14px rgba(224, 122, 95, 0.25);
   
   --transition-fast: 0.15s ease;
   --transition-normal: 0.25s ease;
@@ -120,7 +120,7 @@ p {
 }
 
 .text-orange {
-  color: #e07a5f;
+  color: var(--text-orange);
 }
 
 /* Layout Utilities */
@@ -150,16 +150,16 @@ p {
 }
 
 .btn-primary {
-  background-color: #ffffff;
-  color: #0d0a08;
-  border: 1px solid #ffffff;
-  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.12);
+  background-color: #171717;
+  color: #ffffff;
+  border: 1px solid #171717;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .btn-primary:hover {
-  background-color: #f2e7df;
-  border-color: #f2e7df;
-  box-shadow: 0 6px 18px rgba(255, 255, 255, 0.18);
+  background-color: #2d2d2d;
+  border-color: #2d2d2d;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
   transform: translateY(-1px);
 }
 
@@ -171,22 +171,23 @@ p {
 }
 
 .btn-secondary:hover {
-  background-color: #e8876c;
-  border-color: #e07a5f;
-  box-shadow: 0 6px 18px rgba(224, 122, 95, 0.3);
+  background-color: #d4684d;
+  border-color: #c4573b;
+  box-shadow: 0 6px 18px rgba(224, 122, 95, 0.35);
   transform: translateY(-1px);
 }
 
 .btn-outline {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: #ffffff;
   color: var(--text-primary);
-  border: 1px solid var(--border-dark);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-outline:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: var(--text-secondary);
-  color: #ffffff;
+  background-color: var(--bg-secondary);
+  border-color: var(--border-dark);
+  color: var(--text-primary);
 }
 
 .btn-peach {
@@ -197,7 +198,7 @@ p {
 }
 
 .btn-peach:hover {
-  background-color: #e8876c;
+  background-color: #d4684d;
   transform: translateY(-1px);
 }
 
@@ -230,15 +231,15 @@ p {
 }
 
 .badge-dark {
-  background-color: rgba(224, 122, 95, 0.1);
-  color: #e07a5f;
-  border-color: rgba(224, 122, 95, 0.22);
+  background-color: #fff0eb;
+  color: var(--text-orange);
+  border-color: #fcd8cc;
 }
 
 .badge-peach {
-  background-color: rgba(224, 122, 95, 0.12);
-  color: #e07a5f;
-  border-color: rgba(224, 122, 95, 0.25);
+  background-color: #fff0eb;
+  color: var(--text-orange);
+  border-color: #fcd8cc;
 }
 
 .badge-success {
@@ -247,12 +248,13 @@ p {
   border-color: var(--success-border);
 }
 
-/* Card Styling - Dark Coffee Container with Border */
+/* Card Styling - Clean White Container with Subtle Border */
 .card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 1.4rem;
+  box-shadow: var(--shadow-sm);
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 
@@ -280,7 +282,7 @@ p {
   padding: 0.75rem 1rem;
   font-size: 0.9375rem;
   color: var(--text-primary);
-  background-color: var(--bg-tertiary);
+  background-color: #ffffff;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);

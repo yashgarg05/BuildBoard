@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Logo } from '../components/Logo';
 import './AuthPages.css';
 
 export const LoginPage = () => {
@@ -42,13 +43,8 @@ export const LoginPage = () => {
     <div className="auth-page">
       <div className="auth-card card">
         <div className="auth-header">
-          <Link to="/" className="auth-logo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-              <rect x="3" y="3" width="18" height="18" rx="4"/>
-              <path d="M8 12h8"/>
-              <path d="M12 8v8"/>
-            </svg>
-            <span>BuildBoard</span>
+          <Link to="/" className="auth-logo" aria-label="BuildBoard Home">
+            <Logo size="lg" showBadge={true} />
           </Link>
           <h2>Sign in to your account</h2>
           <p>Welcome back! Enter your credentials to access the platform.</p>

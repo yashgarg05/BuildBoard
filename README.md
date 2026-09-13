@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/logo.svg" alt="BuildBoard Logo" width="380" />
+</p>
+
 # BuildBoard
 
 BuildBoard is a platform designed for developers, creators, and product builders to showcase their projects, discover trending builds, receive community feedback, and track upvotes.

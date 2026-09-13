@@ -28,14 +28,14 @@
   height: 48px;
   min-width: 48px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  background-color: var(--bg-secondary);
   border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   font-size: 1.25rem;
-  color: var(--accent-black);
+  color: var(--text-primary);
 }
 
 .product-card-info {
@@ -59,7 +59,7 @@
 }
 
 .product-title:hover {
-  color: var(--accent-black);
+  color: var(--text-orange);
   text-decoration: underline;
 }
 
