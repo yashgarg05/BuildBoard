@@ -107,6 +107,29 @@
   box-shadow: 0 2px 10px rgba(217, 119, 6, 0.08);
 }
 
+[data-theme="dark"] .winner-podium-container {
+  background: radial-gradient(ellipse at 50% 0%, rgba(224, 122, 95, 0.1) 0%, rgba(22, 24, 29, 0.9) 75%), var(--card-bg);
+}
+
+[data-theme="dark"] .winner-card.rank-gold {
+  background: linear-gradient(145deg, #221c19 0%, var(--card-bg) 80%);
+  border-color: rgba(224, 122, 95, 0.4);
+}
+
+[data-theme="dark"] .winner-card.rank-silver {
+  background: linear-gradient(145deg, #1c1f26 0%, var(--card-bg) 80%);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .winner-card.rank-bronze {
+  background: linear-gradient(145deg, #211c16 0%, var(--card-bg) 80%);
+  border-color: rgba(217, 119, 6, 0.3);
+}
+
+[data-theme="dark"] .winner-rank-badge {
+  background: var(--bg-secondary);
+}
+
 .winner-card-top {
   display: flex;
   align-items: center;

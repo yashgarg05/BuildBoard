@@ -51,8 +51,51 @@
   --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
   --shadow-orange: 0 4px 14px rgba(224, 122, 95, 0.25);
   
+  --header-bg: rgba(255, 255, 255, 0.92);
+  
   --transition-fast: 0.15s ease;
   --transition-normal: 0.25s ease;
+}
+
+/* Color Palette - Deep Obsidian Dark Theme with Warm Terracotta Accent */
+[data-theme="dark"] {
+  --bg-primary: #0f1115;        /* Deep modern obsidian background */
+  --bg-secondary: #16181d;      /* Secondary dark section surface */
+  --bg-tertiary: #1c1f26;       /* Elevated dark element surface */
+  --bg-hover: #22262f;          /* Subtle dark hover state */
+  --card-bg: #16181d;           /* Polished dark card surface */
+  --header-bg: rgba(15, 17, 21, 0.88); /* Translucent dark navbar */
+
+  --text-primary: #f3f4f6;      /* High-contrast crisp off-white text */
+  --text-secondary: #9ca3af;    /* Accessible neutral muted body text */
+  --text-muted: #6b7280;        /* Subtle meta text */
+  --text-inverse: #111827;      /* Dark text for bright surfaces */
+
+  --text-orange: #f08a6e;       /* Warm soft peach accent for dark mode */
+  --accent-orange: #e07a5f;     /* Signature terracotta accent */
+  --accent-orange-glow: rgba(224, 122, 95, 0.28);
+
+  --border-light: #22262f;
+  --border-color: #262a34;      /* Subtle dark border */
+  --border-dark: #374151;       /* Border on hover & active */
+  --border-focus: #e07a5f;
+
+  --accent-black: #f3f4f6;
+  --accent-gray: #9ca3af;
+  --accent-subtle: #6b7280;
+
+  --badge-bg: #1c1f26;
+  --badge-text: #d1d5db;
+  --badge-border: #2e3440;
+
+  --success-bg: rgba(16, 185, 129, 0.15);
+  --success-text: #34d399;
+  --success-border: rgba(16, 185, 129, 0.3);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.5), 0 2px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.6), 0 4px 12px -2px rgba(0, 0, 0, 0.4);
+  --shadow-orange: 0 4px 16px rgba(224, 122, 95, 0.35);
 }
 
 /* Reset & Universal Rules */
@@ -163,6 +206,19 @@ p {
   transform: translateY(-1px);
 }
 
+[data-theme="dark"] .btn-primary {
+  background-color: #f3f4f6;
+  color: #111827;
+  border-color: #f3f4f6;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+  background-color: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
 .btn-secondary {
   background-color: #e07a5f;
   color: #ffffff;
@@ -178,7 +234,7 @@ p {
 }
 
 .btn-outline {
-  background-color: #ffffff;
+  background-color: var(--card-bg);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
@@ -282,11 +338,18 @@ p {
   padding: 0.75rem 1rem;
   font-size: 0.9375rem;
   color: var(--text-primary);
-  background-color: #ffffff;
+  background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
   outline: none;
+}
+
+[data-theme="dark"] .badge-dark,
+[data-theme="dark"] .badge-peach {
+  background-color: rgba(224, 122, 95, 0.15);
+  border-color: rgba(224, 122, 95, 0.3);
+  color: var(--text-orange);
 }
 
 .form-input:focus, .form-textarea:focus, .form-select:focus {

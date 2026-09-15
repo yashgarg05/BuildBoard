@@ -89,6 +89,7 @@
 .bb-logo-xs .bb-brand-name {
   font-size: 0.95rem;
 }
+
 .bb-logo-xs .bb-version-badge {
   font-size: 0.58rem;
   padding: 0.1rem 0.3rem;
@@ -98,6 +99,7 @@
 .bb-logo-sm .bb-brand-name {
   font-size: 1.15rem;
 }
+
 .bb-logo-sm .bb-version-badge {
   font-size: 0.62rem;
   padding: 0.12rem 0.35rem;
@@ -107,6 +109,7 @@
 .bb-logo-md .bb-brand-name {
   font-size: 1.35rem;
 }
+
 .bb-logo-md .bb-version-badge {
   font-size: 0.7rem;
   padding: 0.18rem 0.45rem;
@@ -116,6 +119,7 @@
 .bb-logo-lg .bb-brand-name {
   font-size: 1.85rem;
 }
+
 .bb-logo-lg .bb-version-badge {
   font-size: 0.85rem;
   padding: 0.22rem 0.55rem;
@@ -125,6 +129,7 @@
 .bb-logo-xl .bb-brand-name {
   font-size: 2.35rem;
 }
+
 .bb-logo-xl .bb-version-badge {
   font-size: 1rem;
   padding: 0.28rem 0.65rem;

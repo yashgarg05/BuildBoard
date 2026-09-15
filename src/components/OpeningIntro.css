@@ -1,0 +1,124 @@
+/* Minimal Unique Opening Screen - Clean Light Theme with Terracotta Accent */
+.opening-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background-color: var(--bg-primary, #f8f9fa);
+  background: radial-gradient(circle at 50% 45%, #ffffff 0%, #f8f9fa 65%, #f1f3f5 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  cursor: pointer;
+  transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.opening-screen.screen-leave {
+  opacity: 0;
+  transform: scale(1.04);
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+.opening-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.15rem;
+  animation: introPop 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes introPop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.opening-logo {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: var(--font-family, 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif);
+  font-size: 2.85rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.logo-build {
+  color: var(--text-primary, #171717);
+  transition: color 0.2s ease;
+}
+
+.logo-board {
+  background: linear-gradient(135deg, #ff6338 0%, #ee522b 60%, #e04018 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-left: 2px;
+}
+
+.logo-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-orange, #ee522b);
+  margin-left: 5px;
+  box-shadow: 0 0 12px rgba(238, 82, 43, 0.45);
+  animation: dotPulse 1s infinite alternate;
+}
+
+@keyframes dotPulse {
+  from {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1.2);
+    opacity: 1;
+    box-shadow: 0 0 16px rgba(238, 82, 43, 0.65);
+  }
+}
+
+/* Razor-thin laser sweep line */
+.opening-laser-track {
+  width: 170px;
+  height: 2px;
+  background: rgba(224, 122, 95, 0.16);
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.opening-laser-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #ff6338, #ee522b, transparent);
+  box-shadow: 0 0 10px rgba(238, 82, 43, 0.4);
+  animation: laserSweep 0.85s ease-in-out infinite;
+}
+
+@keyframes laserSweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.opening-tagline {
+  font-family: var(--font-family, 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif);
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--text-secondary, #4b5563);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 0.2s ease;
+}

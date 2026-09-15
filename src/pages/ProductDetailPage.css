@@ -198,7 +198,7 @@
   font-weight: 500;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  background-color: #ffffff;
+  background-color: var(--card-bg);
   color: var(--text-secondary);
   transition: all var(--transition-fast);
 }
@@ -230,7 +230,7 @@
 
 .review-item {
   padding: 1.2rem;
-  background-color: #ffffff;
+  background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
