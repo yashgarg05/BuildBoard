@@ -78,8 +78,8 @@ export default function SettingsMenu({ className = '' }) {
         aria-controls={`${menuId}-menu`}
         aria-label="Settings and preferences"
         title="Settings and preferences"
-        className={`inline-flex items-center gap-2 rounded-full border border-[var(--border-main)] bg-[var(--bg-surface)] px-3 py-1.5 text-sm font-semibold text-[var(--text-main)] shadow-warm-xs transition-all hover:border-[var(--border-strong)] hover:bg-[var(--bg-surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d96b43] focus-visible:ring-offset-2 cursor-pointer ${
-          isOpen ? 'ring-2 ring-[#d96b43]/40 border-[#d96b43]' : ''
+        className={`h-9 inline-flex items-center gap-2 rounded-xl border border-[var(--border-main)] bg-[var(--bg-surface)] px-3 text-xs sm:text-sm font-semibold text-[var(--text-main)] shadow-xs transition-all hover:border-[var(--border-strong)] hover:bg-[var(--bg-surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#d96b43] focus-visible:ring-offset-2 cursor-pointer active:scale-[0.98] ${
+          isOpen ? 'ring-2 ring-[#d96b43]/30 border-[#d96b43]' : ''
         }`}
       >
         {/* Recognizable Gear Icon */}
