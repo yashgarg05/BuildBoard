@@ -82,21 +82,29 @@ export default function Navbar({ className = '' }) {
         </nav>
 
         {/* Actions & Settings Menu */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-2.5">
           {user ? (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <Link
                 to="/problems/new"
-                className="inline-flex items-center justify-center gap-1.5 rounded-full border border-[var(--border-main)] bg-[var(--bg-surface)] px-3.5 py-2 text-xs font-semibold text-[var(--text-main)] shadow-warm-xs transition hover:bg-[var(--bg-surface-subtle)] hover:border-[#d96b43]"
+                className="h-9 inline-flex items-center justify-center gap-1.5 rounded-xl border border-[var(--border-main)] bg-[var(--bg-surface)] px-3.5 text-xs sm:text-sm font-semibold text-[var(--text-main)] shadow-xs transition-all hover:bg-[var(--bg-surface-subtle)] hover:border-[#d96b43] active:scale-[0.98]"
               >
-                <span>+ Validate Problem</span>
+                <svg className="h-3.5 w-3.5 text-[#d96b43]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span>Share Problem</span>
               </Link>
 
               <Link
                 to="/products/new"
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#d96b43] px-4 py-2 text-sm font-semibold text-white shadow-warm-sm transition hover:bg-[#e57b54] hover:-translate-y-0.5 active:translate-y-0"
+                className="h-9 inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#d96b43] px-3.5 text-xs sm:text-sm font-semibold text-white shadow-xs transition-all hover:bg-[#e57b54] hover:shadow-warm-xs active:scale-[0.98]"
               >
-                <span>+ Launch Product</span>
+                <svg className="h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span>Launch Product</span>
               </Link>
 
               <SettingsMenu />
@@ -105,13 +113,13 @@ export default function Navbar({ className = '' }) {
             <div className="flex items-center gap-2.5">
               <Link
                 to="/sign-in"
-                className="rounded-full border border-[var(--border-main)] bg-[var(--bg-surface)] px-4 py-2 text-sm font-semibold text-[var(--text-main)] shadow-warm-sm transition hover:bg-[var(--bg-surface-subtle)] hover:border-[var(--border-strong)]"
+                className="h-9 inline-flex items-center justify-center rounded-xl border border-[var(--border-main)] bg-[var(--bg-surface)] px-3.5 text-xs sm:text-sm font-semibold text-[var(--text-main)] shadow-xs transition-all hover:bg-[var(--bg-surface-subtle)] hover:border-[var(--border-strong)] active:scale-[0.98]"
               >
                 Sign in
               </Link>
               <Link
                 to="/sign-up"
-                className="rounded-full bg-[#141b16] px-4 py-2 text-sm font-semibold text-[#f4ede2] shadow-warm-sm transition hover:bg-[#202c24] hover:-translate-y-0.5 dark:bg-[#f3f4f0] dark:text-[#0b100c] dark:hover:bg-[#ffffff]"
+                className="h-9 inline-flex items-center justify-center rounded-xl bg-[#141b16] px-4 text-xs sm:text-sm font-semibold text-[#f4ede2] shadow-xs transition-all hover:bg-[#202c24] active:scale-[0.98] dark:bg-[#f3f4f0] dark:text-[#0b100c] dark:hover:bg-[#ffffff]"
               >
                 Join BuildBoard
               </Link>
@@ -136,11 +144,11 @@ export default function Navbar({ className = '' }) {
                     { label: 'Tester Studio', to: '/tester/activity', current: isTesterActivity },
                     { label: 'Builder Dashboard', to: '/builder/dashboard', current: isDashboard },
                     { label: 'Launch Product', to: '/products/new', current: isSubmit },
-                    { label: 'Validate Problem', to: '/problems/new', current: location.pathname === '/problems/new' },
+                    { label: 'Share Problem', to: '/problems/new', current: location.pathname === '/problems/new' },
                     { label: 'Profile Settings', to: '/profile/setup', current: isProfile },
                   ]
                 : [
-                    { label: 'Validate Problem', to: '/problems/new', current: location.pathname === '/problems/new' },
+                    { label: 'Share Problem', to: '/problems/new', current: location.pathname === '/problems/new' },
                   ]),
             ]}
           />
