@@ -158,8 +158,12 @@ The previous iteration (`BuildBoard-Landing-Full`) was a single-page marketing c
 | **State** | React Context API | 3 stores: `AuthContext`, `DemoDataContext`, `ThemeContext` |
 | **Provider Hierarchy** | Nested Provider Chain | `BrowserRouter > ThemeProvider > AuthProvider > DemoDataProvider` |
 | **Client Storage** | LocalStorage + IndexedDB | 9 persistent LocalStorage namespaces + IndexedDB media storage (`buildboard_media_db`) |
+| **Client Authentication** | Firebase Web SDK (`firebase ^13.1.0`) | Client-side email/password authentication, persistent sessions, and verification emails |
+| **Backend API** | Node.js (>=22) + Express 5 | REST API (`:3001`) with Helmet security headers, CORS origin protection, and health check |
+| **Server Authentication** | Firebase Admin (`firebase-admin ^13.5.0`) | Cryptographic verification of Firebase ID tokens, claims validation, and revocation checks |
+| **Database** | MySQL 8 (`mysql2/promise`) | Relational persistence with connection pooling; `users` table synchronized via Firebase UID |
 | **Components** | 12 component files in `src/components/` | Modular component inventory (including standalone building blocks) |
-| **Automated Tests** | None | Test suites currently omitted in local demo repository |
+| **Automated Tests** | Syntax & Lint Checks | ESLint 10 + Node `--check` syntax verification suites |
 
 ---
 
@@ -180,14 +184,18 @@ The previous iteration (`BuildBoard-Landing-Full`) was a single-page marketing c
 ## 7. Current State & Next Milestones
 
 ### Current State
-BuildBoard is currently a **fully autonomous, interactive local-demo application**. Every journey—from publishing a prototype and finding testers to submitting structured feedback, uploading local media via IndexedDB, verifying email via simulated `/verify-email`, and validating problem statements with nested Reddit-style threads—is fully functional and persistent within the browser.
+BuildBoard is currently operating in a **hybrid architecture phase**:
+- **Authentication & User Identity**: Fully migrated to production cloud infrastructure. User accounts, secure password hashing, and email verification are managed via **Firebase Authentication**. An **Express 5 API** cryptographically verifies Firebase ID tokens and maintains synchronized user records in **MySQL** keyed by the immutable `firebase_uid`.
+- **Domain Modeling & Community Data**: Product listings, testing checklists, enrollment states, reviews, replies, and problem threads currently continue to execute via client-side storage (`localStorage` and `IndexedDB`) to maintain instant prototyping without database migration disruption.
 
 ### Next Roadmap Milestones
-1. **Production Backend & Database**:
-   - Connect Node.js/Go REST API to a MySQL relational database (schema defined in [`system.md`](file:///Users/yash/Developer/Personal/BuildBoard/docs/system.md)).
-   - Implement server-side verification of the Enrollment Gate so prototype URLs are protected over the wire.
-2. **Real Authentication**:
-   - Replace simulated localStorage auth with JWT / HttpOnly cookie sessions and GitHub/Google OAuth2.
+1. **Full MySQL Domain Data Migration**:
+   - Migrate products, enrollments, structured critiques, and problem discussions from `localStorage` to MySQL tables using the schema defined in [`system.md`](file:///Users/yash/Developer/Personal/BuildBoard/docs/system.md).
+   - Implement server-side verification of the Enrollment Gate so prototype URLs are masked on the wire until enrollment is validated against MySQL.
+2. **Media Storage Cloud Migration**:
+   - Transition prototype screenshots and screen recordings from browser `IndexedDB` to Cloud Storage (Firebase Storage / S3 / GCS) with signed URLs.
+3. **Automated Testing Suite**:
+   - Implement Vitest unit tests for recommendation matching algorithms and Playwright end-to-end testing for the complete enrollment and feedback flow.
 3. **Cloud Media & Object Storage**:
    - Graduate from client-side IndexedDB to S3/Cloudflare R2 object storage for custom product screenshot galleries and video streaming.
 4. **Email & Webhook Notifications**:
