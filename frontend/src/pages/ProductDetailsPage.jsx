@@ -230,6 +230,18 @@ export default function ProductDetailsPage() {
   const [feedbackErrors, setFeedbackErrors] = useState({})
   const [isFeedbackSubmitted, setIsFeedbackSubmitted] = useState(false)
   const [submittedFeedbackPreview, setSubmittedFeedbackPreview] = useState(null)
+  const [enrollmentError, setEnrollmentError] = useState('')
+
+  const handleEnroll = () => {
+    setEnrollmentError('')
+    if (!user) {
+      navigate('/sign-in', { state: { from: location } })
+      return
+    }
+
+    const result = enrollInProduct(product.id, user.email)
+    if (!result.success) setEnrollmentError(result.error)
+  }
 
   // Feedback list filter
   const [feedbackFilter, setFeedbackFilter] = useState('all') // 'all' | 'helpful' | 'needs_reply'
@@ -912,13 +924,7 @@ export default function ProductDetailsPage() {
                       <div>
                         <button
                           type="button"
-                          onClick={() => {
-                            if (user) {
-                              enrollInProduct(product.id, user.email)
-                            } else {
-                              navigate('/sign-in', { state: { from: location } })
-                            }
-                          }}
+                          onClick={handleEnroll}
                           className="w-full rounded-2xl bg-[#d96b43] px-6 py-4 text-base font-bold text-white shadow-warm-md transition duration-200 hover:bg-[#b85028] hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center justify-center gap-2.5 min-h-[48px]"
                         >
                           <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -928,8 +934,13 @@ export default function ProductDetailsPage() {
                           <span>Enroll to Unlock Prototype Link</span>
                         </button>
                         <p className="mt-2.5 text-center text-xs text-[var(--text-subtle)]">
-                          Free enrollment · Revealing preview URL &amp; repository link
+                          Enrollment is saved in this browser&apos;s demo data. The prototype URL &amp; repository link are client-side and aren&apos;t protected by a server.
                         </p>
+                        {enrollmentError && (
+                          <p role="alert" className="mt-3 text-center text-sm font-semibold text-rose-600 dark:text-rose-400">
+                            {enrollmentError}
+                          </p>
+                        )}
                       </div>
                     )
                   ) : (
@@ -1089,11 +1100,11 @@ export default function ProductDetailsPage() {
                             </svg>
                           </div>
                           <h4 className="font-display text-base font-bold text-emerald-900 dark:text-emerald-200">
-                            Critique Saved &amp; Ready for Maker
+                            Feedback Saved in This Browser
                           </h4>
                         </div>
                         <p className="mt-2 text-xs sm:text-sm text-[var(--text-muted)] leading-relaxed">
-                          Your structured feedback has been recorded. When the builder reviews your critique, they can mark it helpful to award you +1 recognition point.
+                          Your note is saved in this browser&apos;s demo data. It isn&apos;t sent to a server or synced to another device. In this demo, the builder can mark it helpful to award you +1 recognition point.
                         </p>
 
                         <div className="mt-4 space-y-2 rounded-2xl border border-[var(--border-main)] bg-[var(--bg-surface)] p-4 text-xs sm:text-sm">

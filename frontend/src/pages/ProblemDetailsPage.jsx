@@ -498,6 +498,14 @@ export default function ProblemDetailsPage() {
     toggleProblemTesterSignup(problem.id, user.email)
   }
 
+  const handleOpenAttachSolution = () => {
+    if (!user) {
+      navigate('/sign-in', { state: { from: location } })
+      return
+    }
+    setShowAttachModal(true)
+  }
+
   const handleDeleteProblem = () => {
     if (!user) return
     const res = deleteProblem(problem.id, user.email)
@@ -508,7 +516,10 @@ export default function ProblemDetailsPage() {
 
   const handleAttachSolutionSubmit = (e) => {
     e.preventDefault()
-    if (!user) return
+    if (!user) {
+      navigate('/sign-in', { state: { from: location } })
+      return
+    }
 
     let finalTitle = solutionTitle.trim()
     let finalUrl = solutionUrl.trim()
@@ -693,7 +704,7 @@ export default function ProblemDetailsPage() {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => setShowAttachModal(true)}
+                      onClick={handleOpenAttachSolution}
                       className="rounded-xl border border-[#d96b43]/40 bg-[#d96b43]/10 px-3 py-1.5 text-xs font-semibold text-[#b85028] dark:text-[#eb8b72] hover:bg-[#d96b43]/20 transition cursor-pointer"
                     >
                       + Attach Solution
@@ -848,7 +859,7 @@ export default function ProblemDetailsPage() {
 
                 <button
                   type="button"
-                  onClick={() => setShowAttachModal(true)}
+                  onClick={handleOpenAttachSolution}
                   className="rounded-xl bg-[#141b16] px-4 py-2 text-xs font-semibold text-[#f4ede2] hover:bg-[#202c24] transition dark:bg-[#f3f4f0] dark:text-[#0b100c] shadow-warm-xs cursor-pointer"
                 >
                   + Propose a Solution
@@ -867,7 +878,7 @@ export default function ProblemDetailsPage() {
                     </p>
                     <button
                       type="button"
-                      onClick={() => setShowAttachModal(true)}
+                      onClick={handleOpenAttachSolution}
                       className="mt-4 rounded-xl border-2 border-[#d96b43] bg-transparent px-5 py-2.5 text-sm font-bold text-[#d96b43] hover:bg-[#d96b43]/10 transition cursor-pointer"
                     >
                       Attach your prototype
@@ -1088,8 +1099,8 @@ export default function ProblemDetailsPage() {
                   </svg>
                   <span>
                     {hasSubscribed
-                      ? `✓ Subscribed to Solution Updates (${subscribersCount})`
-                      : `Notify Me When Solution Launches (${subscribersCount} watching)`}
+                      ? `✓ Following Solution Updates (${subscribersCount})`
+                      : `Follow Solution Updates (${subscribersCount} following)`}
                   </span>
                 </button>
 
@@ -1120,6 +1131,11 @@ export default function ProblemDetailsPage() {
               {!user && (
                 <p className="mt-3 text-center text-[11px] text-[var(--text-subtle)]">
                   Sign in required to record your confirmation or subscribe to updates.
+                </p>
+              )}
+              {user && (
+                <p className="mt-3 text-center text-[11px] text-[var(--text-subtle)]">
+                  Demo mode: following is saved in this browser; email and push alerts are not sent.
                 </p>
               )}
             </div>
@@ -1190,7 +1206,7 @@ export default function ProblemDetailsPage() {
                   <div>
                     <h4 className="font-bold text-sm sm:text-base text-[var(--text-main)]">4. Live Structured Testing</h4>
                     <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5 leading-relaxed">
-                      Subscribed users test the prototype and submit structured feedback.
+                      After a prototype is attached, enrolled testers can try it and submit structured feedback.
                     </p>
                   </div>
                 </div>

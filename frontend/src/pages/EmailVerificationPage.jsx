@@ -65,13 +65,13 @@ export default function EmailVerificationPage() {
 
           <div className="my-14 max-w-xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1 text-sm font-semibold text-[#ffa36b]">
-              <span>Account verification</span>
+              <span>Demo account flow</span>
             </div>
             <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl font-display font-semibold leading-[1.08] tracking-tight !text-white text-white">
               Confirm your email.
             </h1>
             <p className="mt-4 max-w-md text-base sm:text-lg leading-relaxed text-[#c5cdc7]">
-              Confirm your email address to unlock prototype testing, provide structured feedback, and earn builder recognition points.
+              This demo screen simulates the verification step. No email is sent; continuing stores the entered email as your local demo session.
             </p>
           </div>
 
@@ -94,10 +94,10 @@ export default function EmailVerificationPage() {
             transition={{ duration: 0.35, ease: 'easeOut' }}
           >
             <p className="text-sm font-bold uppercase tracking-wider text-[#d96b43]">
-              Account Security
+              Demo Verification
             </p>
             <h2 className="mt-2 text-2xl sm:text-3xl font-display font-semibold tracking-tight text-[var(--text-main)]">
-              Verify your account
+              Simulate email verification
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
               Account email:
@@ -105,7 +105,7 @@ export default function EmailVerificationPage() {
             <p className="mt-0.5 break-all font-mono font-semibold text-sm text-[var(--text-main)]">{email}</p>
 
             <div className="mt-5 border-l-2 border-[#d96b43] bg-[var(--bg-surface-subtle)] p-3.5 text-sm leading-relaxed text-[var(--text-muted)] rounded-r-xl">
-              <strong className="text-[var(--text-main)]">One-click activation:</strong> Click below to verify your email and immediately activate your session.
+              <strong className="text-[var(--text-main)]">No email is sent:</strong> Click below to simulate verification and activate this browser&apos;s demo session.
             </div>
 
             {isVerified ? (
@@ -121,7 +121,7 @@ export default function EmailVerificationPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-bold text-sm text-emerald-800 dark:text-emerald-300">Verification complete!</h3>
+                      <h3 className="font-bold text-sm text-emerald-800 dark:text-emerald-300">Demo verification complete</h3>
                       <p className="mt-0.5 text-sm leading-relaxed text-[var(--text-muted)]">
                         You are now signed in as <span className="font-semibold text-[var(--text-main)]">{email}</span>. Your workspace and testing profile are ready.
                       </p>

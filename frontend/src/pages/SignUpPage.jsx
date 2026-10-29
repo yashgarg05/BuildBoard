@@ -106,7 +106,7 @@ export default function SignUpPage() {
             </h2>
 
             <p className="mt-1.5 text-sm leading-relaxed text-[var(--text-muted)]">
-              Start with your email and a password. You can customize your preferences right after.
+              Create a local demo profile with your email. The password is only checked for length and is not stored; no account or email is created.
             </p>
 
             <form className="mt-7 space-y-4" onSubmit={handleSubmit} noValidate>

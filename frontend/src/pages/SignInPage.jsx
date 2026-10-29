@@ -104,7 +104,7 @@ export default function SignInPage() {
               Sign in to BuildBoard
             </h2>
             <p className="mt-1.5 text-sm leading-relaxed text-[var(--text-muted)]">
-              Enter your account email and password to continue.
+              Demo sign-in: enter any valid email and a non-empty password. Your password is not checked or stored; only the email is saved in this browser.
             </p>
 
             <form className="mt-7 space-y-4" onSubmit={handleSubmit} noValidate>
