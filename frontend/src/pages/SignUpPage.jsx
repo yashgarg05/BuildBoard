@@ -5,15 +5,19 @@ import SettingsMenu from '../components/SettingsMenu.jsx'
 import PasswordInput from '../components/PasswordInput.jsx'
 import Logo from '../components/Logo.jsx'
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js'
+import { getAuthErrorMessage, useAuth } from '../context/AuthContext.jsx'
 
 export default function SignUpPage() {
   useDocumentTitle('Join BuildBoard | Early products. Real people.')
   const navigate = useNavigate()
   const location = useLocation()
+  const { signUp } = useAuth()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState({})
+  const [authError, setAuthError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   function validate() {
     const nextErrors = {}
@@ -35,16 +39,25 @@ export default function SignUpPage() {
     return Object.keys(nextErrors).length === 0
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
     if (!validate()) return
 
-    navigate('/verify-email', {
-      state: {
-        email: email.trim(),
-        from: location.state?.from,
-      },
-    })
+    setAuthError('')
+    setIsSubmitting(true)
+    try {
+      const created = await signUp(email.trim(), password)
+      navigate('/verify-email', {
+        state: {
+          email: created.email,
+          from: location.state?.from,
+        },
+      })
+    } catch (error) {
+      setAuthError(getAuthErrorMessage(error))
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -106,7 +119,7 @@ export default function SignUpPage() {
             </h2>
 
             <p className="mt-1.5 text-sm leading-relaxed text-[var(--text-muted)]">
-              Create a local demo profile with your email. The password is only checked for length and is not stored; no account or email is created.
+              Create your account with Firebase. We&apos;ll send a verification link before you can use signed-in features.
             </p>
 
             <form className="mt-7 space-y-4" onSubmit={handleSubmit} noValidate>
@@ -173,11 +186,14 @@ export default function SignUpPage() {
                 </p>
               </div>
 
+              {authError && <p role="alert" className="text-sm font-semibold text-rose-600 dark:text-rose-400">{authError}</p>}
+
               <button
                 className="mt-2 w-full rounded-full bg-[#d96b43] px-5 py-3 text-sm font-semibold text-white shadow-warm-sm transition duration-150 hover:bg-[#b85028] active:translate-y-0.5 cursor-pointer"
                 type="submit"
+                disabled={isSubmitting}
               >
-                Create account
+                {isSubmitting ? 'Creating account…' : 'Create account'}
               </button>
             </form>
 

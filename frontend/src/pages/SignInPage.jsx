@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 import { MotionConfig, motion } from 'motion/react'
-import { useAuth } from '../context/AuthContext.jsx'
+import { getAuthErrorMessage, useAuth } from '../context/AuthContext.jsx'
 import SettingsMenu from '../components/SettingsMenu.jsx'
 import PasswordInput from '../components/PasswordInput.jsx'
 import Logo from '../components/Logo.jsx'
@@ -9,13 +9,17 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle.js'
 
 export default function SignInPage() {
   useDocumentTitle('Sign In | BuildBoard')
-  const { signIn } = useAuth()
+  const { signIn, resetPassword } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState({})
+  const [authError, setAuthError] = useState('')
+  const [authNotice, setAuthNotice] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isResettingPassword, setIsResettingPassword] = useState(false)
 
   function validate() {
     const nextErrors = {}
@@ -35,18 +39,52 @@ export default function SignInPage() {
     return Object.keys(nextErrors).length === 0
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
     if (!validate()) return
 
-    signIn(email.trim())
-    const from = location.state?.from
-    const redirect = typeof from === 'string'
-      ? from
-      : from?.pathname
-        ? `${from.pathname}${from.search || ''}${from.hash || ''}`
-        : '/'
-    navigate(redirect)
+    setAuthError('')
+    setAuthNotice('')
+    setIsSubmitting(true)
+    try {
+      await signIn(email.trim(), password)
+      const from = location.state?.from
+      const redirect = typeof from === 'string'
+        ? from
+        : from?.pathname
+          ? `${from.pathname}${from.search || ''}${from.hash || ''}`
+          : '/'
+      navigate(redirect)
+    } catch (error) {
+      if (error?.code === 'auth/email-not-verified') {
+        navigate('/verify-email', {
+          state: { email: email.trim(), from: location.state?.from },
+        })
+      } else {
+        setAuthError(getAuthErrorMessage(error))
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  async function handlePasswordReset() {
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setAuthError('Enter a valid email address first, then request a password reset.')
+      return
+    }
+
+    setAuthError('')
+    setAuthNotice('')
+    setIsResettingPassword(true)
+    try {
+      await resetPassword(email)
+      setAuthNotice('If an account exists for this email, Firebase has sent a password reset link.')
+    } catch (error) {
+      setAuthError(getAuthErrorMessage(error))
+    } finally {
+      setIsResettingPassword(false)
+    }
   }
 
   return (
@@ -104,7 +142,7 @@ export default function SignInPage() {
               Sign in to BuildBoard
             </h2>
             <p className="mt-1.5 text-sm leading-relaxed text-[var(--text-muted)]">
-              Demo sign-in: enter any valid email and a non-empty password. Your password is not checked or stored; only the email is saved in this browser.
+              Sign in with the email and password you used to create your BuildBoard account. You must verify your email first.
             </p>
 
             <form className="mt-7 space-y-4" onSubmit={handleSubmit} noValidate>
@@ -166,13 +204,25 @@ export default function SignInPage() {
                     {errors.password}
                   </p>
                 )}
+                <button
+                  type="button"
+                  onClick={handlePasswordReset}
+                  disabled={isResettingPassword}
+                  className="mt-2 text-sm font-semibold text-[#d96b43] hover:underline disabled:opacity-60"
+                >
+                  {isResettingPassword ? 'Sending reset link…' : 'Forgot password?'}
+                </button>
               </div>
+
+              {authError && <p role="alert" className="text-sm font-semibold text-rose-600 dark:text-rose-400">{authError}</p>}
+              {authNotice && <p role="status" className="text-sm text-emerald-700 dark:text-emerald-300">{authNotice}</p>}
 
               <button
                 className="mt-2 w-full rounded-full bg-[#d96b43] px-5 py-3 text-sm font-semibold text-white shadow-warm-sm transition duration-150 hover:bg-[#b85028] active:translate-y-0.5 cursor-pointer"
                 type="submit"
+                disabled={isSubmitting}
               >
-                Sign in
+                {isSubmitting ? 'Signing in…' : 'Sign in'}
               </button>
             </form>
 
