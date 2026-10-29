@@ -1,7 +1,5 @@
-import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import { MotionConfig, motion } from 'motion/react'
-import { useAuth } from '../context/AuthContext.jsx'
 import SettingsMenu from '../components/SettingsMenu.jsx'
 import Logo from '../components/Logo.jsx'
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js'
@@ -9,41 +7,10 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle.js'
 export default function EmailVerificationPage() {
   useDocumentTitle('Verify Account | BuildBoard')
   const location = useLocation()
-  const navigate = useNavigate()
-  const { user, signIn } = useAuth()
-
-  const email = location.state?.email || user?.email || 'member@example.com'
-  const [isVerified, setIsVerified] = useState(false)
+  const email = location.state?.email || new URLSearchParams(location.search).get('email') || ''
 
   const from = location.state?.from
-  const destination = typeof from === 'string'
-    ? from
-    : from?.pathname
-      ? `${from.pathname}${from.search || ''}${from.hash || ''}`
-      : '/explore'
-
-  let destinationLabel = 'Explore'
-  const destPath = typeof from === 'string' ? from : (from?.pathname || destination)
-  if (destPath === '/products/new') {
-    destinationLabel = 'Submit product'
-  } else if (destPath.startsWith('/products/')) {
-    destinationLabel = 'Product details'
-  } else if (destPath === '/builder/dashboard') {
-    destinationLabel = 'Builder Dashboard'
-  } else if (destPath.startsWith('/profile')) {
-    destinationLabel = 'Profile setup'
-  } else if (destination !== '/explore') {
-    destinationLabel = destination
-  }
-
-  function handleVerify() {
-    signIn(email)
-    setIsVerified(true)
-  }
-
-  function handleContinue() {
-    navigate(destination)
-  }
+  const signInState = from ? { from } : undefined
 
   return (
     <MotionConfig reducedMotion="user">
@@ -65,13 +32,13 @@ export default function EmailVerificationPage() {
 
           <div className="my-14 max-w-xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1 text-sm font-semibold text-[#ffa36b]">
-              <span>Demo account flow</span>
+              <span>Email verification</span>
             </div>
             <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl font-display font-semibold leading-[1.08] tracking-tight !text-white text-white">
               Confirm your email.
             </h1>
             <p className="mt-4 max-w-md text-base sm:text-lg leading-relaxed text-[#c5cdc7]">
-              This demo screen simulates the verification step. No email is sent; continuing stores the entered email as your local demo session.
+              Verify your email address to activate your BuildBoard account and continue to the feature you were trying to use.
             </p>
           </div>
 
@@ -94,64 +61,27 @@ export default function EmailVerificationPage() {
             transition={{ duration: 0.35, ease: 'easeOut' }}
           >
             <p className="text-sm font-bold uppercase tracking-wider text-[#d96b43]">
-              Demo Verification
+              Account setup
             </p>
             <h2 className="mt-2 text-2xl sm:text-3xl font-display font-semibold tracking-tight text-[var(--text-main)]">
-              Simulate email verification
+              Check your inbox
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
-              Account email:
+              {email ? 'We sent a verification link to:' : 'Open the verification link we sent to your email address.'}
             </p>
-            <p className="mt-0.5 break-all font-mono font-semibold text-sm text-[var(--text-main)]">{email}</p>
+            {email && <p className="mt-0.5 break-all font-mono font-semibold text-sm text-[var(--text-main)]">{email}</p>}
 
             <div className="mt-5 border-l-2 border-[#d96b43] bg-[var(--bg-surface-subtle)] p-3.5 text-sm leading-relaxed text-[var(--text-muted)] rounded-r-xl">
-              <strong className="text-[var(--text-main)]">No email is sent:</strong> Click below to simulate verification and activate this browser&apos;s demo session.
+              Open the email and follow its verification link. If you don&apos;t see it, check your spam folder. After verification, return here and sign in.
             </div>
 
-            {isVerified ? (
-              <div className="mt-6 space-y-3">
-                <div
-                  role="status"
-                  className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-[var(--text-main)]"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white dark:bg-emerald-500">
-                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3} aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-sm text-emerald-800 dark:text-emerald-300">Demo verification complete</h3>
-                      <p className="mt-0.5 text-sm leading-relaxed text-[var(--text-muted)]">
-                        You are now signed in as <span className="font-semibold text-[var(--text-main)]">{email}</span>. Your workspace and testing profile are ready.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleContinue}
-                  className="w-full rounded-full bg-[#1b241e] px-5 py-3 text-sm font-semibold text-white shadow-warm-sm transition hover:bg-[#2e3b32] dark:bg-[#fbfaf7] dark:text-[#0b100c] active:translate-y-0.5 cursor-pointer"
-                >
-                  Continue to {destinationLabel} →
-                </button>
-              </div>
-            ) : (
-              <div className="mt-6 space-y-4">
-                <button
-                  type="button"
-                  onClick={handleVerify}
-                  className="w-full rounded-full bg-[#d96b43] px-5 py-3 text-sm font-semibold text-white shadow-warm-sm transition hover:bg-[#b85028] active:translate-y-0.5 cursor-pointer"
-                >
-                  Confirm & activate account →
-                </button>
-
-                <p className="text-center text-sm text-[var(--text-subtle)]">
-                  Instant activation. No waiting required.
-                </p>
-              </div>
-            )}
+            <Link
+              to="/sign-in"
+              state={signInState}
+              className="mt-6 flex w-full items-center justify-center rounded-full bg-[#d96b43] px-5 py-3 text-sm font-semibold text-white shadow-warm-sm transition hover:bg-[#b85028] active:translate-y-0.5"
+            >
+              Continue to sign in →
+            </Link>
 
             <div className="mt-6 border-t border-[var(--border-main)] pt-4">
               <Link
