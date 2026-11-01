@@ -1,0 +1,26 @@
+node_modules/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Service account keys and certificates (defense-in-depth)
+*service-account*.json
+*.pem
+*.key
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS and Editor
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.sw?

@@ -24,8 +24,13 @@ This document provides a comprehensive, chronological, and thematic log of every
    - Decision 3.3: Kinetic Typography & Micro-Interactions via Motion
    - Decision 3.4: Accessibility, Reduced-Motion Compliance & Skip Links
    - Decision 3.5: User Identity Model — Email Keys vs. Name Display
-4. [Tooling & Engineering Methodology](#4-tooling--engineering-methodology)
-5. [Summary Matrix of Code Decisions](#5-summary-matrix-of-code-decisions)
+4. [Backend Infrastructure & Hybrid Architecture (Phase 4: API & Auth Foundation)](#4-backend-infrastructure--hybrid-architecture-phase-4-api--auth-foundation)
+   - Decision 4.1: Production Firebase Authentication with Mandatory Email Verification
+   - Decision 4.2: Express 5 API Service with Firebase Admin Token Verification
+   - Decision 4.3: MySQL Identity Schema Keyed by Firebase UID
+   - Decision 4.4: Staged Hybrid Migration Strategy (Auth/Identity in Cloud, Domain Models in Client Demo)
+5. [Tooling & Engineering Methodology](#5-tooling--engineering-methodology)
+6. [Summary Matrix of Code Decisions](#6-summary-matrix-of-code-decisions)
 
 ---
 
@@ -259,44 +264,110 @@ This document provides a comprehensive, chronological, and thematic log of every
 
 ---
 
-## 4. Tooling & Engineering Methodology
+## 4. Backend Infrastructure & Hybrid Architecture (Phase 4: API & Auth Foundation)
+
+### Decision 4.1: Production Firebase Authentication with Mandatory Email Verification
+
+- **What Changed:**
+  - Integrated official Firebase Client SDK (`firebase ^13.1.0`) inside `frontend/src/lib/firebase.js`.
+  - Re-implemented `AuthContext.jsx` to wrap `createUserWithEmailAndPassword`, `signInWithEmailAndPassword`, `sendEmailVerification`, and `sendPasswordResetEmail`.
+  - Enforced a hard verification gate: unverified accounts cannot sign in to access protected features; users are redirected to `EmailVerificationPage.jsx` with real verification status instructions.
+  - Converted `SignInPage.jsx` and `SignUpPage.jsx` into production auth forms with comprehensive error mapping (`auth/email-already-in-use`, `auth/wrong-password`, `auth/too-many-requests`, etc.).
+- **Why It Was Changed:**
+  - In earlier iterations, authentication was an insecure in-memory/localStorage string simulation that allowed any user to spoof identity by changing their browser email.
+  - Offloading password hashing, salting, session tokens, and verification links to Firebase Authentication ensures enterprise-grade security and avoids storing sensitive credentials in self-hosted databases.
+
+---
+
+### Decision 4.2: Express 5 API Service with Firebase Admin Token Verification
+
+- **What Changed:**
+  - Created a dedicated Node.js backend workspace in `backend/` using Express 5 (`express ^5.1.0`) with ESM native modules (`type: "module"`).
+  - Configured essential security middleware: `helmet()` for HTTP header protection, strict `cors()` with origin whitelisting, and strict JSON body parsing limits (`32kb`).
+  - Implemented token authentication middleware `requireAuth.js` utilizing `firebase-admin/auth` (`verifyIdToken(token, true)` with checkRevoked flag).
+  - Extracted verified claims (`firebaseUid`, `email`, `emailVerified`) directly from the cryptographic token rather than trusting request headers or body parameters.
+- **Why It Was Changed:**
+  - Protects future REST APIs and database queries behind cryptographic signature verification.
+  - Decouples client presentation from direct database connections, preventing SQL injection or credential leakage in client bundles.
+
+---
+
+### Decision 4.3: MySQL Identity Schema Keyed by Firebase UID
+
+- **What Changed:**
+  - Authored `backend/schema.sql` declaring the `buildboard` database and initial `users` table:
+    - Primary key: `id BIGINT UNSIGNED AUTO_INCREMENT`
+    - Stable external identifier: `firebase_uid VARCHAR(128) NOT NULL UNIQUE`
+    - Contact email: `email VARCHAR(320) NOT NULL UNIQUE`
+    - Status flag: `email_verified BOOLEAN NOT NULL DEFAULT FALSE`
+  - Added `POST /api/auth/me` endpoint that executes an idempotent upsert (`INSERT INTO users ... ON DUPLICATE KEY UPDATE`) whenever an authenticated user connects.
+- **Why It Was Changed:**
+  - Firebase UID provides an immutable, unique identifier that never changes even if a user updates their email address.
+  - Relational mapping in MySQL establishes a high-performance foundation for foreign key relations (products, feedback, enrollments) in subsequent migration phases.
+
+---
+
+### Decision 4.4: Staged Hybrid Migration Strategy (Auth/Identity in Cloud, Domain Models in Client Demo)
+
+- **What Changed:**
+  - Retained `DemoDataContext.jsx` for product listings, builder checklists, problem threads, and IndexedDB media during this milestone.
+  - Connected `AuthContext` to both Firebase (for session management) and the Express API (for MySQL identity sync), while maintaining compatibility with client-side demo data.
+  - Configured root script `"dev:api": "npm --prefix backend run dev"` alongside `"dev"` to enable full-stack local development.
+- **Why It Was Changed:**
+  - Avoided "big bang" rewrite risks: breaking existing rich demo data (checklists, nested comments, IndexedDB videos) during authentication overhaul.
+  - Allows team members to test production authentication independently while backend engineers finalize schema migrations for products and feedback.
+
+---
+
+## 5. Tooling & Engineering Methodology
 
 | Category | Tool / Choice | Rationale |
 | :--- | :--- | :--- |
-| **Framework** | React 19 (JSX) | Modern hooks, functional components, concurrent rendering |
+| **Frontend Framework** | React 19 (JSX) | Modern hooks, functional components, concurrent rendering |
 | **Bundler** | Vite 8 | Near-instant startup, ESM native modules, hot module replacement in <50ms. |
 | **Router** | React Router 8 (`react-router ^8.4.0`) | Client-side routing with deep-link support and code-splitting. |
 | **Compiler** | `@tailwindcss/vite` | Official Tailwind v4 integration; eliminates PostCSS overhead and enables CSS-native configuration. |
 | **Motion** | `motion/react` | The modern, tree-shakeable packaging of Framer Motion; robust spring physics and layout animations. |
-| **Icons** | Custom Inline SVG Paths | Zero icon font bundle overhead, full CSS color inheritance, and pixel-precise stroke rendering. |
-| **Linting** | ESLint 10 (`eslint-plugin-react-hooks`, `eslint-plugin-react-refresh`) | Enforces hook safety, dependency exhaustiveness, and fast-refresh compatibility. |
-| **Automated Tests** | None | No automated test suite configured in current demo repository. |
+| **Icons** | Lucide React & Inline SVG | Clean modern iconography and pixel-precise SVG control. |
+| **Client Auth** | Firebase Web SDK (`firebase ^13.1.0`) | Secure client-side credential handling, session persistence, and email verification. |
+| **Backend Runtime** | Node.js (>=22) | High-performance asynchronous I/O and native ESM module execution with `--watch`. |
+| **Backend Framework** | Express 5 (`express ^5.1.0`) | Battle-tested, minimal REST routing framework with async route handlers. |
+| **API Security** | Helmet (`^8.1.0`) & CORS | Hardened HTTP response headers and origin-filtered request dispatching. |
+| **Server Auth** | Firebase Admin (`firebase-admin ^13.5.0`) | Cryptographic verification of JWT ID tokens and token revocation checks. |
+| **Database** | MySQL 8 (`mysql2/promise`) | High-performance relational database with connection pooling and utf8mb4 charset. |
+| **Linting** | ESLint 10 (`eslint-plugin-react-hooks`) | Enforces hook safety, dependency exhaustiveness, and fast-refresh compatibility. |
 
 ---
 
-## 5. Summary Matrix of Code Decisions
+## 6. Summary Matrix of Code Decisions
 
 ```
-+-------------------------------------------------------------------------------------------------------+
-| DECISION                 | OLD PROJECT                    | CURRENT BUILDBOARD          | PRIMARY DRIVER                |
-+-------------------------------------------------------------------------------------------------------+
-| Navigation Architecture  | Single-page tab state          | React Router 8 SPA (^8.4.0) | Deep linking & history        |
-| Core Purpose             | Upvote leaderboard             | Structured testing loop     | Actionable builder feedback   |
-| State & Persistence      | Volatile in-memory mock        | 9 LocalStorage keys +       | Multi-session demo workflow   |
-|                          |                                | IndexedDB media storage     | and client media uploads      |
-| Product Identifiers      | Real project names             | Name slugs (suffix clash)   | Clean URL routing & identity  |
-| Enrollment Storage       | None                           | Object keyed email:prodId   | O(1) membership check         |
-| Styling Framework        | Vanilla CSS files (13 files)   | Tailwind v4 CSS tokens      | Design consistency & speed    |
-| Motion & Animation       | Basic CSS keyframes            | Motion spring physics       | Dynamic tactile feedback      |
-| Match Engine             | None                           | Match count (+1 each)       | Transparent reasons ranking   |
-| Access Control           | Public link visibility         | Enrollment Gate             | Tester commitment & tracking  |
-| Feedback Model           | Read-only testimonials         | 6 categories, experience,   | Standardized bug reporting    |
-|                          |                                | likes, single maker reply   | and recognition loop          |
-| Feedback Reminders       | None                           | Banner with 3 tiers         | Contextual re-engagement      |
-|                          |                                | (recent, early, followup)   | without external surveillance |
-| Pre-Build Validation     | None                           | Shipped Problems forum with | Validate demand before code;  |
-|                          |                                | Reddit nested comments      | engage early adopters         |
-| Page Shell Structure     | Single global shell            | Navbar/Footer per page      | Route-specific layout control  |
-| UI Density               | Heavy cards & pills            | Clean modern typography     | Minimalist, high-signal UI    |
-+-------------------------------------------------------------------------------------------------------+
++-------------------------------------------------------------------------------------------------------------------+
+| DECISION                 | OLD PROJECT                    | CURRENT BUILDBOARD              | PRIMARY DRIVER              |
++-------------------------------------------------------------------------------------------------------------------+
+| Navigation Architecture  | Single-page tab state          | React Router 8 SPA (^8.4.0)     | Deep linking & history      |
+| Core Purpose             | Upvote leaderboard             | Structured testing loop         | Actionable builder feedback |
+| State & Persistence      | Volatile in-memory mock        | 9 LocalStorage keys +           | Multi-session demo workflow |
+|                          |                                | IndexedDB media storage         | and client media uploads    |
+| Authentication Model     | Mock localStorage email key    | Firebase Auth (Email/Password   | Cryptographic security,     |
+|                          | simulation                     | + Email Verification)           | verified email gating       |
+| API Backend              | None (Browser only)            | Node.js + Express 5 API         | Token verification, identity|
+|                          |                                | (Port 3001)                     | management, CORS protection |
+| Server Database          | None (Browser only)            | MySQL 8 (users table keyed      | Relational user mapping     |
+|                          |                                | by Firebase UID)                | for future domain models    |
+| Product Identifiers      | Real project names             | Name slugs (suffix clash)       | Clean URL routing & identity|
+| Enrollment Storage       | None                           | Object keyed email:prodId       | O(1) membership check       |
+| Styling Framework        | Vanilla CSS files (13 files)   | Tailwind v4 CSS tokens          | Design consistency & speed  |
+| Motion & Animation       | Basic CSS keyframes            | Motion spring physics           | Dynamic tactile feedback    |
+| Match Engine             | None                           | Match count (+1 each)           | Transparent reasons ranking |
+| Access Control           | Public link visibility         | Enrollment Gate                 | Tester commitment & tracking|
+| Feedback Model           | Read-only testimonials         | 6 categories, experience,       | Standardized bug reporting  |
+|                          |                                | likes, single maker reply       | and recognition loop        |
+| Feedback Reminders       | None                           | Banner with 3 tiers             | Contextual re-engagement    |
+|                          |                                | (recent, early, followup)       | without surveillance        |
+| Pre-Build Validation     | None                           | Shipped Problems forum with     | Validate demand before code;|
+|                          |                                | Reddit nested comments          | engage early adopters       |
+| Page Shell Structure     | Single global shell            | Navbar/Footer per page          | Route-specific layout control|
+| UI Density               | Heavy cards & pills            | Clean modern typography         | Minimalist, high-signal UI  |
++-------------------------------------------------------------------------------------------------------------------+
 ```

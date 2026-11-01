@@ -1,7 +1,5 @@
-import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import { MotionConfig, motion } from 'motion/react'
-import { useAuth } from '../context/AuthContext.jsx'
 import SettingsMenu from '../components/SettingsMenu.jsx'
 import Logo from '../components/Logo.jsx'
 import { useDocumentTitle } from '../hooks/useDocumentTitle.js'
@@ -9,41 +7,10 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle.js'
 export default function EmailVerificationPage() {
   useDocumentTitle('Verify Account | BuildBoard')
   const location = useLocation()
-  const navigate = useNavigate()
-  const { user, signIn } = useAuth()
-
-  const email = location.state?.email || user?.email || 'member@example.com'
-  const [isVerified, setIsVerified] = useState(false)
+  const email = location.state?.email || new URLSearchParams(location.search).get('email') || ''
 
   const from = location.state?.from
-  const destination = typeof from === 'string'
-    ? from
-    : from?.pathname
-      ? `${from.pathname}${from.search || ''}${from.hash || ''}`
-      : '/explore'
-
-  let destinationLabel = 'Explore'
-  const destPath = typeof from === 'string' ? from : (from?.pathname || destination)
-  if (destPath === '/products/new') {
-    destinationLabel = 'Submit product'
-  } else if (destPath.startsWith('/products/')) {
-    destinationLabel = 'Product details'
-  } else if (destPath === '/builder/dashboard') {
-    destinationLabel = 'Builder Dashboard'
-  } else if (destPath.startsWith('/profile')) {
-    destinationLabel = 'Profile setup'
-  } else if (destination !== '/explore') {
-    destinationLabel = destination
-  }
-
-  function handleVerify() {
-    signIn(email)
-    setIsVerified(true)
-  }
-
-  function handleContinue() {
-    navigate(destination)
-  }
+  const signInState = from ? { from } : undefined
 
   return (
     <MotionConfig reducedMotion="user">
@@ -68,7 +35,7 @@ export default function EmailVerificationPage() {
           <div className="relative z-10 my-14 max-w-xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-main)] bg-[var(--bg-surface)] px-3.5 py-1 text-xs sm:text-sm font-mono uppercase tracking-[0.14em] font-semibold text-[#1f3a6b] dark:text-[#dbbf95] shadow-2xs">
               <span className="h-1.5 w-1.5 rounded-full bg-[#1f3a6b] dark:bg-[#dbbf95]" aria-hidden="true" />
-              <span>Account verification</span>
+              <span>Email verification</span>
             </div>
 
             <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold leading-[1.08] tracking-tight text-[var(--text-main)]">
@@ -79,7 +46,7 @@ export default function EmailVerificationPage() {
             </h1>
 
             <p className="mt-4 max-w-md text-base sm:text-lg leading-relaxed text-[var(--text-muted)]">
-              Confirm your email address to unlock prototype testing, provide structured feedback, and earn builder recognition points.
+              Verify your email address to activate your BuildBoard account and continue to the feature you were trying to use.
             </p>
           </div>
 
@@ -105,61 +72,24 @@ export default function EmailVerificationPage() {
               Account Security
             </p>
             <h2 className="mt-2 text-2xl sm:text-3xl font-display font-semibold tracking-tight text-[var(--text-main)]">
-              Verify your account
+              Check your inbox
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
-              Account email:
+              {email ? 'We sent a verification link to:' : 'Open the verification link we sent to your email address.'}
             </p>
-            <p className="mt-0.5 break-all font-mono font-semibold text-sm text-[var(--text-main)]">{email}</p>
+            {email && <p className="mt-0.5 break-all font-mono font-semibold text-sm text-[var(--text-main)]">{email}</p>}
 
             <div className="mt-5 border-l-2 border-[#1f3a6b] dark:border-[#dbbf95] bg-[var(--bg-surface-subtle)] p-3.5 text-sm leading-relaxed text-[var(--text-muted)] rounded-r-xl">
-              <strong className="text-[var(--text-main)]">One-click activation:</strong> Click below to verify your email and immediately activate your session.
+              Open the email and follow its verification link. If you don&apos;t see it, check your spam folder. After verification, return here and sign in.
             </div>
 
-            {isVerified ? (
-              <div className="mt-6 space-y-3">
-                <div
-                  role="status"
-                  className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-[var(--text-main)]"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white dark:bg-emerald-500">
-                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3} aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-sm text-emerald-800 dark:text-emerald-300">Verification complete!</h3>
-                      <p className="mt-0.5 text-sm leading-relaxed text-[var(--text-muted)]">
-                        You are now signed in as <span className="font-semibold text-[var(--text-main)]">{email}</span>. Your workspace and testing profile are ready.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleContinue}
-                  className="w-full rounded-full bg-[#1f3a6b] px-5 py-3 text-sm font-semibold text-white shadow-warm-sm transition hover:bg-[#182f56] active:translate-y-0.5 dark:bg-[#dbbf95] dark:text-[#15203a] dark:hover:bg-[#ecdcc2] cursor-pointer"
-                >
-                  Continue to {destinationLabel} →
-                </button>
-              </div>
-            ) : (
-              <div className="mt-6 space-y-4">
-                <button
-                  type="button"
-                  onClick={handleVerify}
-                  className="w-full rounded-full bg-[#1f3a6b] px-5 py-3 text-sm font-semibold text-white shadow-warm-sm transition hover:bg-[#182f56] active:translate-y-0.5 dark:bg-[#dbbf95] dark:text-[#15203a] dark:hover:bg-[#ecdcc2] cursor-pointer"
-                >
-                  Confirm & activate account →
-                </button>
-
-                <p className="text-center text-sm text-[var(--text-subtle)]">
-                  Instant activation. No waiting required.
-                </p>
-              </div>
-            )}
+            <Link
+              to="/sign-in"
+              state={signInState}
+              className="mt-6 flex w-full items-center justify-center rounded-full bg-[#1f3a6b] px-5 py-3 text-sm font-semibold text-white shadow-warm-sm transition hover:bg-[#182f56] active:translate-y-0.5 dark:bg-[#dbbf95] dark:text-[#15203a] dark:hover:bg-[#ecdcc2]"
+            >
+              Continue to sign in →
+            </Link>
 
             <div className="mt-6 border-t border-[var(--border-main)] pt-4">
               <Link

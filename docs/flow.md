@@ -14,7 +14,8 @@ This document traces the exact step-by-step code execution flow between files, c
 7. [Journey 5: Builder Feedback Review, Reply & Recognition Flow](#7-journey-5-builder-feedback-review-reply--recognition-flow)
 8. [Journey 6: Time-Tiered Feedback Reminder Engine Flow](#8-journey-6-time-tiered-feedback-reminder-engine-flow)
 9. [Journey 7: Problems Forum & Problem-to-Solution Linking Flow](#9-journey-7-problems-forum--problem-to-solution-linking-flow)
-10. [End-to-End Sequence Diagram](#10-end-to-end-sequence-diagram)
+10. [Journey 8: User Authentication & Backend Identity Synchronization Flow](#10-journey-8-user-authentication--backend-identity-synchronization-flow)
+11. [End-to-End Sequence Diagram](#11-end-to-end-sequence-diagram)
 
 ---
 ## 1. Application Boot & Initialization Flow
@@ -32,8 +33,11 @@ index.html
         │     └─► Synchronously injects or removes 'dark' class on <html>
         │
         ├─► <AuthProvider> (src/context/AuthContext.jsx)
-        │     └─► Reads 'buildboard_demo_user' from localStorage
-        │     └─► Initializes demo user state ({ name, email, role })
+        │     └─► Connects to Firebase Authentication via onAuthStateChanged (src/lib/firebase.js)
+        │     └─► Enforces email verification requirement (unverified accounts cannot sign in)
+        │     └─► Sends verified ID token to Express backend POST /api/auth/me
+        │     └─► Receives synchronized MySQL user identity record ({ id, firebase_uid, email, email_verified })
+        │     └─► Initializes user state: { uid, id, email, emailVerified, displayName }
         │
         ├─► <DemoDataProvider> (src/context/DemoDataContext.jsx)
         │     └─► Reads 9 localStorage keys (products, profiles, enrollments dictionary, feedback, views, etc.)
@@ -347,7 +351,69 @@ ProductDetailsPage renders Reminder Banner directly above the feedback section:
 
 ---
 
-## 10. End-to-End Sequence Diagram
+## 10. Journey 8: User Authentication & Backend Identity Synchronization Flow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant View as SignUpPage / SignInPage
+    participant AuthCtx as AuthContext.jsx
+    participant Firebase as Firebase Authentication (Client)
+    participant API as Express API (Node.js :3001)
+    participant Admin as Firebase Admin SDK
+    participant MySQL as MySQL Database (buildboard.users)
+
+    Note over User,View: Phase A: Sign-Up & Email Verification Flow
+    User->>View: Enters email and password on /sign-up
+    View->>AuthCtx: signUp(email, password)
+    AuthCtx->>Firebase: createUserWithEmailAndPassword(firebaseAuth, email, pass)
+    Firebase-->>AuthCtx: Returns UserCredential
+    AuthCtx->>Firebase: sendEmailVerification(credential.user)
+    AuthCtx->>Firebase: signOut(firebaseAuth)
+    View->>User: Redirects to /verify-email with inbox instructions
+
+    Note over User,View: Phase B: Email Link Verification
+    User->>User: Opens email client and clicks verification link
+    Firebase-->>User: Firebase marks email_verified = true
+
+    Note over User,View: Phase C: Sign-In & MySQL Identity Synchronization
+    User->>View: Enters credentials on /sign-in
+    View->>AuthCtx: signIn(email, password)
+    AuthCtx->>Firebase: signInWithEmailAndPassword(firebaseAuth, email, pass)
+    AuthCtx->>Firebase: credential.user.reload()
+    alt Email is not verified
+        AuthCtx-->>View: Throws auth/email-not-verified error
+        View-->>User: Displays error with resend verification link
+    else Email is verified
+        AuthCtx->>Firebase: getIdToken()
+        Firebase-->>AuthCtx: Returns signed JWT ID token
+        AuthCtx->>API: POST /api/auth/me (Authorization: Bearer <ID_TOKEN>)
+        API->>Admin: verifyIdToken(token, checkRevoked = true)
+        Admin-->>API: Validated claims: { uid, email, email_verified }
+        API->>MySQL: INSERT INTO users (firebase_uid, email, email_verified) VALUES (...) ON DUPLICATE KEY UPDATE...
+        API->>MySQL: SELECT id, firebase_uid, email, email_verified, created_at FROM users WHERE firebase_uid = ?
+        MySQL-->>API: Returns user row
+        API-->>AuthCtx: Returns { user: databaseUser }
+        AuthCtx->>AuthCtx: setUser(toAppUser(firebaseUser, databaseUser))
+        View-->>User: Navigates to target destination (/explore, /builder/dashboard, etc.)
+    end
+```
+
+### Function Call Sequence:
+1. `SignUpPage.jsx` → `signUp(email, password)`
+2. `AuthContext.jsx` → `createUserWithEmailAndPassword(firebaseAuth, ...)`
+3. `AuthContext.jsx` → `sendEmailVerification(...)`
+4. `SignInPage.jsx` → `signIn(email, password)`
+5. `AuthContext.jsx` → `getIdToken()` → `syncUserWithApi(firebaseUser)`
+6. `fetch('http://127.0.0.1:3001/api/auth/me')` with `Bearer <token>`
+7. `backend/src/middleware/requireAuth.js` → `firebaseAuth.verifyIdToken(token, true)`
+8. `backend/src/routes/auth.js` → `database.execute('INSERT INTO users...')`
+9. React state updated with `{ uid, id, email, emailVerified, displayName }`
+
+---
+
+## 11. End-to-End Sequence Diagram
 
 ```
 +---------------+           +---------------+           +-----------------+          +-------------------+

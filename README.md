@@ -89,27 +89,33 @@ flowchart LR
 ## Quick Start
 
 ### Prerequisites
-- **Node.js**: v20+ recommended
+- **Node.js**: v22+ recommended (v20+ supported for frontend)
 - **npm**: v10+ recommended
+- **MySQL**: 8.0+ (optional for frontend-only demo; required for backend API identity sync)
 
-### Option 1: Run from Root Directory (Recommended)
+### Option 1: Run Full Stack (Frontend + API)
 ```bash
-# Install frontend dependencies
+# 1. Install frontend and backend dependencies
 npm --prefix frontend install
+npm --prefix backend install
 
-# Start development server
-npm run dev
+# 2. Configure environment files
+cp frontend/.env.example frontend/.env.local
+cp backend/.env.example backend/.env
+
+# 3. Setup MySQL database schema (if using backend)
+mysql -u root -p < backend/schema.sql
+
+# 4. Start both servers (in separate terminals or background)
+npm run dev        # Starts Vite frontend on http://localhost:5173
+npm run dev:api    # Starts Express API on http://localhost:3001
 ```
 
-### Option 2: Run from `frontend/` Directory
+### Option 2: Frontend-Only Local Demo
 ```bash
 # Navigate to the frontend workspace
 cd frontend
-
-# Install dependencies
 npm install
-
-# Start the Vite dev server
 npm run dev
 ```
 
@@ -119,12 +125,13 @@ Open [http://localhost:5173](http://localhost:5173) in your browser to explore t
 
 ## Available Scripts
 
-Run these scripts from either the root directory or inside `frontend/`:
+Run these scripts from either the root directory or targeted workspace:
 
 | Command | Action |
 | :--- | :--- |
-| `npm run dev` | Starts the Vite local development server with Hot Module Replacement (HMR) |
-| `npm run build` | Compiles optimized production bundle into `frontend/dist/` |
+| `npm run dev` | Starts the Vite local development server for frontend (port `5173`) |
+| `npm run dev:api` | Starts the Express API server with `--watch` auto-reloading (port `3001`) |
+| `npm run build` | Compiles optimized frontend production bundle into `frontend/dist/` |
 | `npm run lint` | Runs ESLint checks across the codebase |
 | `npm run preview` | Previews the production build locally |
 
@@ -140,19 +147,23 @@ Run these scripts from either the root directory or inside `frontend/`:
 | **Icons & Typography** | [Lucide React](https://lucide.dev/), Google Fonts (Inter) |
 | **Animations** | [Motion](https://motion.dev/) (`motion/react`) with reduced-motion support |
 | **State Management** | React Context (`AuthContext`, `DemoDataContext`, `ThemeContext`) |
-| **Storage & Persistence**| Local `localStorage` (9 data namespaces) + `IndexedDB` (media/video uploads) |
+| **Authentication** | Firebase Authentication (email/password + email verification) |
+| **API & Identity** | Node.js + Express API; Firebase Admin token verification |
+| **Database** | MySQL (Firebase UID keyed identity records; app data migration is pending) |
+| **Demo Data** | Browser `localStorage` + `IndexedDB` for product, feedback, problem, and media demo data |
 | **External APIs** | Algolia Hacker News Search REST API (`https://hn.algolia.com/api/v1`) |
 
 ---
 
-## Local Demo Architecture
+## Current Architecture: Firebase Auth + Local Demo Data
 
-BuildBoard is currently architected as a **zero-dependency, frontend-only local demo**:
+BuildBoard is in a staged migration from a browser-only prototype to a Node API and MySQL. Authentication is connected to Firebase; product and community data are still local demo data.
 
-- **No Remote Database Required**: All profiles, product submissions, feedback, upvotes, and comments are persisted securely in your browser's `localStorage`.
-- **Media via IndexedDB**: Prototype screenshots and video uploads are stored locally in the browser's `IndexedDB` storage engine to prevent `localStorage` quota overflow.
-- **Instant Reset / Seed Data**: Pre-populated with realistic builder prototypes, tester critiques, and problem discussions out-of-the-box.
-- **Future Milestone**: Centralized database persistence, cloud authentication, and automated testing suites are planned for subsequent milestones.
+- **Authentication**: Firebase handles email/password accounts and verification emails. The frontend sends Firebase ID tokens to the Express API, which verifies them with Firebase Admin and requires a verified email.
+- **MySQL identity table**: `GET /api/health` checks the API/database connection. `POST /api/auth/me` upserts the signed-in identity by Firebase UID into `backend/schema.sql`'s `users` table.
+- **App data is still local**: Product listings, profiles, enrollments, feedback, and problem threads still use the browser's demo storage. They are not yet synchronized through MySQL.
+- **Media via IndexedDB**: Prototype screenshots and video uploads remain in the browser's `IndexedDB` storage.
+- **Local setup**: Configure `frontend/.env.local` from `frontend/.env.example` and `backend/.env` from `backend/.env.example`. Keep the Firebase service-account JSON outside the repository. Run `npm run dev` and `npm run dev:api` in separate terminals.
 
 ---
 
@@ -178,6 +189,10 @@ BuildBoard/
 │   │   ├── App.jsx             # Top-level routing & layout structure
 │   │   └── main.jsx            # Application entrypoint
 │   └── package.json            # Frontend dependencies & build configuration
+├── backend/                    # Express API, Firebase token verification, MySQL schema
+│   ├── src/                    # Server, Firebase/MySQL config, auth middleware and routes
+│   ├── schema.sql              # Initial MySQL users table
+│   └── .env.example            # Local API configuration template
 ├── package.json                # Root proxy runner scripts
 └── README.md                   # Project documentation
 ```

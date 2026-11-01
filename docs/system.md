@@ -54,30 +54,29 @@ BuildBoard follows a **Modular Three-Tier Client Architecture**:
 |   Hierarchical Provider Context Tree (src/main.jsx):                                  |
 |   <BrowserRouter>                                                                     |
 |     └─► <ThemeProvider> (Dark/light mode root class & CSS variables)                  |
-|           └─► <AuthProvider> (Demo identity & session management)                     |
+|           └─► <AuthProvider> (Firebase Auth session + Express API sync)               |
 |                 └─► <DemoDataProvider> (Products, enrollments, feedback, problems)   |
 |                       └─► <App />                                                     |
 +---------------------------------------------------------------------------------------+
                                            │
-                                           ▼
-+---------------------------------------------------------------------------------------+
-|                                  PERSISTENCE LAYER                                    |
-|                                                                                       |
-|   Browser Storage (Zero-Latency Local Sandbox):                                       |
-|   - 9 LocalStorage Namespaces:                                                        |
-|       1. buildboard_demo_custom_products                                              |
-|       2. buildboard_demo_enrollments                                                  |
-|       3. buildboard_demo_feedback                                                     |
-|       4. buildboard_demo_views                                                        |
-|       5. buildboard_demo_profiles                                                     |
-|       6. buildboard_demo_reminder_dismissals                                          |
-|       7. buildboard_demo_problems                                                     |
-|       8. buildboard_demo_user                                                         |
-|       9. buildboard-theme                                                             |
-|   - IndexedDB database (buildboard_media_db) for local screenshots & media uploads    |
-|   - In-memory seed fallbacks (src/data/products.js, src/data/problems.js)             |
-|   - Error-tolerant serialization with quota overflow boundaries                       |
-+---------------------------------------------------------------------------------------+
+                    ┌──────────────────────┴──────────────────────┐
+                    ▼                                             ▼
++---------------------------------------+     +---------------------------------------+
+|        CLIENT PERSISTENCE LAYER       |     |         BACKEND API & DATABASE        |
+|                                       |     |                                       |
+|   Browser Storage (Client Sandbox):   |     |   Node.js / Express 5 API (:3001):    |
+|   - 8 LocalStorage Namespaces:        |     |   - Helmet security headers & CORS    |
+|       1. buildboard_demo_custom_prods |     |   - Firebase Admin token verification |
+|       2. buildboard_demo_enrollments  |     |   - POST /api/auth/me identity sync   |
+|       3. buildboard_demo_feedback     |     |   - GET /api/health db ping           |
+|       4. buildboard_demo_views        |     |                                       |
+|       5. buildboard_demo_profiles     |     |   MySQL 8 Database (buildboard):      |
+|       6. buildboard_demo_reminders    |     |   - users table (firebase_uid, email, |
+|       7. buildboard_demo_problems     |     |     email_verified, created_at)       |
+|       8. buildboard-theme             |     |   - Connection pooling via mysql2     |
+|   - IndexedDB (buildboard_media_db)   |     +---------------------------------------+
+|     for local screenshots & media     |
++---------------------------------------+
 ```
 
 ---
@@ -305,13 +304,13 @@ $$E(P, U) = \begin{cases}
 
 ## 6. Security Architecture & Threat Model
 
-### Current Client-Side Prototype Constraints
-1. **Client-Visible Secrets**: In the demo prototype, external prototype URLs exist inside client-side JS memory even before enrollment.
-2. **Client-Side Auth**: The demo user identity is stored in `localStorage` and can be edited via DevTools. Simulated email verification exists at `/verify-email`.
-3. **Derived Recognition**: Tamperable in local storage, but deterministic across reloads.
-4. **Automated Tests**: No automated tests currently exist in the repository; quality assurance relies on linting, TypeScript/Vite build validation, and manual verification flows.
+### Current Hybrid Prototype Security Posture
+1. **Production Authentication Implemented**: Authentication is handled by Firebase Authentication. User credentials, salted password hashes, and email verification tokens never hit our application server. The frontend client exchanges Firebase ID tokens with the Express API over `Authorization: Bearer <token>`.
+2. **Server-Side Token Verification (`requireAuth.js`)**: The backend utilizes `firebase-admin/auth` with `verifyIdToken(token, true)` to verify cryptographic signature, expiration, and revocation status. Accounts with unverified emails (`email_verified = false`) are rejected with `403 Forbidden`.
+3. **HTTP Hardening**: The Express server implements `helmet()` for secure HTTP headers, strict origin-filtered `cors()`, and payload size limits (`32kb`).
+4. **Client-Side Domain Storage (Temporary)**: In the current milestone, product listings, checklists, and reviews remain in browser `localStorage`/`IndexedDB` demo data. Server-enforced URL masking will occur during the upcoming domain data migration.
 
-### Production Security Model (Mandatory for Cloud Launch)
+### Production Security Model (Target Architecture)
 ```
                                 CLIENT UNTRUSTED BOUNDARY
 ─────────────────────────────────────────────────────────────────────────────────────────
@@ -319,28 +318,27 @@ $$E(P, U) = \begin{cases}
 
 [Client Browser] 
        │
-       ├─► 1. HTTPS / TLS 1.3 Termination (HSTS, CSP, CORS headers)
+       ├─► 1. Firebase Authentication (Client SDK: Email/Password, Email Verification)
+       │     └─► Obtains cryptographically signed Firebase ID token (JWT)
        │
-       ├─► 2. Reverse Proxy & Rate Limiter (Cloudflare / NGINX / Envoy)
-       │     └─► 100 req/min for public catalog; 10 req/min for feedback submits
+       ├─► 2. Express 5 API Server (:3001)
+       │     ├─► Helmet HTTP protection & CORS origin whitelist
+       │     ├─► requireAuth middleware: firebaseAuth.verifyIdToken(token, checkRevoked)
+       │     ├─► Extracts verified claims: uid, email, email_verified
+       │     └─► Server-Enforced Enrollment Gate (Upcoming):
+       │           'productUrl' is ONLY included in JSON payload if:
+       │           EXISTS(SELECT 1 FROM enrollments WHERE user_id = req.user.id)
        │
-       ├─► 3. Authentication Gateway (JWT with HttpOnly SameSite=Strict cookies)
-       │     └─► OAuth2 (GitHub / Google) + Argon2id hashed passwords
-       │
-       ├─► 4. Application Server (Node.js Express / Go / Fastify)
-       │     ├─► Schema Validation via Zod / TypeBox (Strict input sanitization)
-       │     ├─► Server-Enforced Enrollment Gate:
-       │     │     CRITICAL: 'productUrl' is ONLY included in JSON payload if:
-       │     │     EXISTS(SELECT 1 FROM enrollments WHERE user_id = req.user.id)
-       │     └─► HTML Sanitization: DOMPurify on feedback markdown
-       │
-       └─► 5. Database Layer (MySQL 8.0+ with connection pooling)
-             └─► Row-Level Ownership Verification (Builders can only reply to own products)
+       └─► 3. MySQL 8 Database (buildboard)
+             ├─► users table: keyed by stable firebase_uid
+             └─► Foreign key relations (products, feedback, enrollments) with ON DELETE CASCADE
 ```
 
 ---
 
 ## 7. Production Backend Migration Blueprint (MySQL + REST API)
+
+> **Implementation Status**: Step 1 (Users Table & Token Authentication) is **Shipped** in `backend/schema.sql` and `backend/src/routes/auth.js`. Steps 2–9 below represent the migration target for domain models.
 
 ### MySQL Relational Database Schema DDL
 
