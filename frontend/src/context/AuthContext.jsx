@@ -6,6 +6,10 @@ export const useAuth = () => useContext(AuthContext);
 
 const AUTH_STORAGE_KEY = 'buildboard_demo_user';
 
+export function getAuthErrorMessage(error) {
+  return error?.message || 'Authentication failed. Please try again.';
+}
+
 export const AuthProvider = ({ children }) => {
   // Demo user object – persisted locally on this device without passwords or secrets.
   const [user, setUser] = useState(() => {
@@ -29,19 +33,29 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
-  const signIn = (email) => {
+  const signIn = async (email) => {
     const trimmed = (email || '').trim() || 'member@example.com';
-    setUser({ email: trimmed });
+    const appUser = { email: trimmed, emailVerified: true };
+    setUser(appUser);
+    return appUser;
+  };
+
+  const signUp = async (email) => {
+    const trimmed = (email || '').trim() || 'member@example.com';
+    const appUser = { email: trimmed, emailVerified: true };
+    setUser(appUser);
+    return appUser;
   };
 
   const signOut = () => {
     setUser(null);
   };
 
+  const resetPassword = () => Promise.resolve();
+
   return (
-    <AuthContext.Provider value={{ user, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, signIn, signUp, signOut, resetPassword, loading: false }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
