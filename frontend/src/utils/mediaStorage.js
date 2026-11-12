@@ -1,10 +1,12 @@
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { firebaseStorage, isStorageConfigured } from '../lib/firebase.js'
 import { saveMediaFile } from './indexedDB.js'
+import { uploadMediaToApi } from '../lib/api.js'
 
 export const MAX_IMAGE_SIZE = 10 * 1024 * 1024 // 10 MB
 export const MAX_VIDEO_SIZE = 50 * 1024 * 1024 // 50 MB
-export const CLOUD_STORAGE_TIMEOUT_MS = 5000 // 5 seconds max per upload attempt before fallback
+export const CLOUD_IMAGE_TIMEOUT_MS = 30000 // 30 seconds max per image upload
+export const CLOUD_VIDEO_TIMEOUT_MS = 120000 // 120 seconds max per video upload
 
 /**
  * Race a promise against a timeout to prevent hanging when Cloud Storage or network is stalled.
@@ -105,9 +107,28 @@ export async function uploadProductMedia({ file, userId = 'anonymous', folder = 
     throw new Error(validation.error)
   }
 
-  // 1. Attempt Cloud Storage upload if configured
+  // 1. Native Database Media Storage (Zero-billing, stores in TiDB via Express API)
+  try {
+    const apiResult = await uploadMediaToApi(file)
+    if (apiResult?.url) {
+      return {
+        url: apiResult.url,
+        mediaId: apiResult.mediaId,
+        isCloud: true,
+        name: apiResult.name || file.name || 'media',
+        size: apiResult.size || file.size,
+        type: apiResult.type || file.type,
+      }
+    }
+  } catch (apiErr) {
+    console.warn('[BuildBoard] Native API media upload fallback:', apiErr.message)
+  }
+
+  // 2. Attempt Cloud Storage upload if configured
   if (isStorageConfigured && firebaseStorage) {
     try {
+      const isVideo = file.type?.startsWith('video/')
+      const timeoutMs = isVideo ? CLOUD_VIDEO_TIMEOUT_MS : CLOUD_IMAGE_TIMEOUT_MS
       const sanitizedName = (file.name || 'media').replace(/[^a-zA-Z0-9._-]/g, '_')
       const storagePath = `products/${userId}/${folder}/${Date.now()}_${sanitizedName}`
       const storageRef = ref(firebaseStorage, storagePath)
@@ -116,13 +137,13 @@ export async function uploadProductMedia({ file, userId = 'anonymous', folder = 
         uploadBytes(storageRef, file, {
           contentType: file.type || 'application/octet-stream',
         }),
-        CLOUD_STORAGE_TIMEOUT_MS,
+        timeoutMs,
         'Cloud storage upload timed out'
       )
 
       const downloadUrl = await withTimeout(
         getDownloadURL(snapshot.ref),
-        CLOUD_STORAGE_TIMEOUT_MS,
+        timeoutMs,
         'Cloud storage download URL fetch timed out'
       )
 

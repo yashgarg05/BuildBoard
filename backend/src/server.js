@@ -15,6 +15,7 @@ import enrollmentRoutes from './routes/enrollments.js'
 import feedbackRoutes from './routes/feedback.js'
 import problemsRoutes from './routes/problems.js'
 import notificationRoutes from './routes/notifications.js'
+import mediaRoutes from './routes/media.js'
 
 const app = express()
 app.set('trust proxy', 1)
@@ -118,11 +119,12 @@ app.use(cors({
     return callback(new Error(`Origin ${origin} is not allowed by CORS.`))
   },
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Authorization', 'Content-Type', 'X-Request-Id'],
+  allowedHeaders: ['Authorization', 'Content-Type', 'X-Request-Id', 'X-File-Name'],
   credentials: true,
 }))
 
 // Request Body Limits
+app.use('/api/media', express.raw({ type: ['image/*', 'application/octet-stream'], limit: '10mb' }))
 app.use(express.json({ limit: '32kb' }))
 
 // Rate Limiters
@@ -131,6 +133,7 @@ const standardLimiter = rateLimit({
   max: 300,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.method === 'OPTIONS',
   message: { error: 'Too many requests from this IP. Please try again later.' },
 })
 
@@ -139,14 +142,16 @@ const authLimiter = rateLimit({
   max: 40,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.method === 'OPTIONS',
   message: { error: 'Too many authentication attempts. Please wait 15 minutes and try again.' },
 })
 
 const mutationLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 60,
+  max: 300,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS',
   message: { error: 'Too many mutation actions performed. Please slow down and try again shortly.' },
 })
 
@@ -208,6 +213,7 @@ app.use('/api/enrollments', enrollmentRoutes)
 app.use('/api/feedback', feedbackRoutes)
 app.use('/api/problems', problemsRoutes)
 app.use('/api/notifications', notificationRoutes)
+app.use('/api/media', mediaRoutes)
 
 // Safe Structured Error Handler
 app.use((error, req, res, _next) => {

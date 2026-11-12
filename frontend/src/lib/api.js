@@ -1,6 +1,10 @@
 import { firebaseAuth, isFirebaseConfigured } from './firebase.js'
 
-export const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:3001').replace(/\/$/, '')
+const env = (typeof import.meta !== 'undefined' && import.meta.env)
+  ? import.meta.env
+  : (typeof globalThis !== 'undefined' && globalThis.process?.env ? globalThis.process.env : {})
+
+export const API_BASE_URL = (env.VITE_API_URL || 'http://127.0.0.1:3001').replace(/\/$/, '')
 
 async function getAuthHeader() {
   if (!isFirebaseConfigured || !firebaseAuth?.currentUser) {
@@ -144,6 +148,26 @@ export async function deleteProductListing(slugOrId) {
   return request(`/api/products/${encodeURIComponent(slugOrId)}`, {
     method: 'DELETE',
   })
+}
+
+export async function uploadMediaToApi(file) {
+  const authHeaders = await getAuthHeader()
+  const fileName = encodeURIComponent(file.name || 'media')
+  const response = await fetch(`${API_BASE_URL}/api/media`, {
+    method: 'POST',
+    headers: {
+      ...authHeaders,
+      'Content-Type': file.type || 'application/octet-stream',
+      'X-File-Name': fileName,
+    },
+    body: file,
+  })
+
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) {
+    throw new Error(data.error || 'Failed to upload media file.')
+  }
+  return data
 }
 
 export async function enrollInProductApi(slugOrId) {

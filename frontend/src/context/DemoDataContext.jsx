@@ -413,6 +413,15 @@ export const DemoDataProvider = ({ children }) => {
   // Deleted product IDs tracking (in memory)
   const [deletedProductIds, setDeletedProductIds] = useState([])
 
+  const getLocalMediaMap = () => {
+    try {
+      if (typeof window === 'undefined') return {}
+      return JSON.parse(localStorage.getItem('buildboard_media_map') || '{}')
+    } catch {
+      return {}
+    }
+  }
+
   // Combined product list (server products from MySQL are authoritative)
   const products = useMemo(() => {
     const deletedSet = new Set(deletedProductIds)
@@ -421,15 +430,24 @@ export const DemoDataProvider = ({ children }) => {
 
     const activeCustom = customProducts.filter((p) => !deletedSet.has(p.id) && !serverKeys.has(p.id))
     const all = [...activeServer, ...activeCustom]
+    const localMediaMap = getLocalMediaMap()
+
     return all.map((p) => {
       const email = (p.creatorEmail || '').toLowerCase().trim()
-      if (email && profiles[email]?.displayName?.trim()) {
-        return {
-          ...p,
-          maker: profiles[email].displayName.trim(),
-        }
+      const localMedia = localMediaMap[p.id] || localMediaMap[p.slug] || null
+      const maker = (email && profiles[email]?.displayName?.trim())
+        ? profiles[email].displayName.trim()
+        : p.maker
+
+      return {
+        ...p,
+        maker,
+        mediaId: p.mediaId || localMedia?.mediaId || null,
+        galleryMediaIds: (p.galleryMediaIds && p.galleryMediaIds.length > 0)
+          ? p.galleryMediaIds
+          : (localMedia?.galleryMediaIds || []),
+        videoMediaId: p.videoMediaId || localMedia?.videoMediaId || null,
       }
-      return p
     })
   }, [serverProducts, customProducts, profiles, deletedProductIds])
 
@@ -479,6 +497,21 @@ export const DemoDataProvider = ({ children }) => {
             isServerSynced: true,
             isOwner: true,
             creatorEmail: creatorEmail || res.product?.creatorEmail,
+          }
+          if (formData.mediaId || (Array.isArray(formData.galleryMediaIds) && formData.galleryMediaIds.length > 0) || formData.videoMediaId) {
+            try {
+              const currentMap = getLocalMediaMap()
+              const mediaEntry = {
+                mediaId: formData.mediaId || null,
+                galleryMediaIds: Array.isArray(formData.galleryMediaIds) ? formData.galleryMediaIds : [],
+                videoMediaId: formData.videoMediaId || null,
+              }
+              if (serverProduct.id) currentMap[serverProduct.id] = mediaEntry
+              if (serverProduct.slug) currentMap[serverProduct.slug] = mediaEntry
+              localStorage.setItem('buildboard_media_map', JSON.stringify(currentMap))
+            } catch (err) {
+              console.warn('[BuildBoard] Could not save local media mapping:', err)
+            }
           }
           setServerProducts((prev) => [serverProduct, ...prev.filter((p) => p.id !== serverProduct.id)])
           return serverProduct
@@ -1259,6 +1292,17 @@ export const DemoDataProvider = ({ children }) => {
       })
       return copy
     })
+
+    // Clean up local media mapping
+    try {
+      const currentMap = getLocalMediaMap()
+      delete currentMap[productId]
+      delete currentMap[targetProduct.id]
+      if (targetProduct.slug) delete currentMap[targetProduct.slug]
+      localStorage.setItem('buildboard_media_map', JSON.stringify(currentMap))
+    } catch {
+      // ignore
+    }
 
     return { success: true }
   }

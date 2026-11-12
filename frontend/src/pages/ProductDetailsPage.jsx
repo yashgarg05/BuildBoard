@@ -254,9 +254,9 @@ export default function ProductDetailsPage() {
   // Deletion modal state & handler for owner
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  const handleDeleteProduct = () => {
+  const handleDeleteProduct = async () => {
     if (!user || !product) return
-    const res = deleteProduct(product.id, user.email)
+    const res = await deleteProduct(product.id, user.email)
     if (!res.success) {
       alert(res.error || 'Failed to delete listing')
       return

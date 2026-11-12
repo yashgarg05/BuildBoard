@@ -781,6 +781,7 @@ router.patch('/:slugOrId/pause', requireAuth, async (req, res, next) => {
 // DELETE /api/products/:slugOrId (Delete product listing by creator)
 // ----------------------------------------------------------------------
 router.delete('/:slugOrId', requireAuth, async (req, res, next) => {
+  const connection = await database.getConnection()
   try {
     const userId = await findUserId(req.authUser.firebaseUid)
     if (!userId) {
@@ -792,7 +793,7 @@ router.delete('/:slugOrId', requireAuth, async (req, res, next) => {
     const selectQuery = `SELECT id, creator_id FROM products WHERE ${isNumeric ? 'id = ? OR slug = ?' : 'slug = ?'} LIMIT 1`
     const selectParams = isNumeric ? [Number(slugOrId), slugOrId] : [slugOrId]
 
-    const [rows] = await database.execute(selectQuery, selectParams)
+    const [rows] = await connection.execute(selectQuery, selectParams)
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Product listing not found.' })
     }
@@ -802,14 +803,27 @@ router.delete('/:slugOrId', requireAuth, async (req, res, next) => {
       return res.status(403).json({ error: 'Only the product creator can delete this listing.' })
     }
 
-    await database.execute('DELETE FROM products WHERE id = ?', [targetProduct.id])
+    await connection.beginTransaction()
+
+    // Explicitly delete child/dependent rows to ensure compatibility across all DB engines
+    await connection.execute('DELETE FROM product_target_criteria WHERE product_id = ?', [targetProduct.id])
+    await connection.execute('DELETE FROM product_test_steps WHERE product_id = ?', [targetProduct.id])
+    await connection.execute('DELETE FROM product_feedback WHERE product_id = ?', [targetProduct.id])
+    await connection.execute('DELETE FROM product_enrollments WHERE product_id = ?', [targetProduct.id])
+    await connection.execute('UPDATE problem_solutions SET product_id = NULL WHERE product_id = ?', [targetProduct.id])
+    await connection.execute('DELETE FROM products WHERE id = ?', [targetProduct.id])
+
+    await connection.commit()
 
     return res.json({
       success: true,
       message: 'Product listing deleted successfully.',
     })
   } catch (error) {
+    await connection.rollback()
     return next(error)
+  } finally {
+    connection.release()
   }
 })
 
